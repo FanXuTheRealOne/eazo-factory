@@ -9,12 +9,13 @@
   "interface": {
     "displayName": "Eazo Factory",
     "shortDescription": "Generate a polished, reviewed Eazo app from one prompt.",
-    "longDescription": "Eazo Factory turns one product prompt into a standardized Eazo app scaffold based on the official Eazo Next.js template, then verifies the result before handoff.",
+    "longDescription": "Eazo Factory turns one product prompt into a standardized Eazo app using the official Eazo Next.js template, $imagegen design, deterministic checks, and mandatory independent review.",
     "developerName": "EazoAI",
     "category": "Developer Tools",
     "capabilities": [
-      "Generate standardized Eazo app scaffolds",
-      "Validate plugin and marketplace metadata"
+      "Generate standardized Eazo apps from the official template",
+      "Create functional UI references with image generation",
+      "Audit every interactive control with an independent reviewer"
     ],
     "defaultPrompt": [
       "Use @eazo-factory to create one standardized Eazo app."

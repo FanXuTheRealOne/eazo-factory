@@ -27,19 +27,22 @@ if (interfaceBlock.shortDescription !== "Generate a polished, reviewed Eazo app 
 }
 if (
   interfaceBlock.longDescription !==
-  "Eazo Factory turns one product prompt into a standardized Eazo app scaffold based on the official Eazo Next.js template, then verifies the result before handoff."
+  "Eazo Factory turns one product prompt into a standardized Eazo app using the official Eazo Next.js template, $imagegen design, deterministic checks, and mandatory independent review."
 ) {
   throw new Error("wrong longDescription");
 }
 if (interfaceBlock.developerName !== "EazoAI") throw new Error("wrong developerName");
 if (interfaceBlock.category !== "Developer Tools") throw new Error("wrong category");
 if (!Array.isArray(interfaceBlock.capabilities)) throw new Error("capabilities must be an array");
-if (interfaceBlock.capabilities.length !== 2) throw new Error("wrong capabilities length");
-if (interfaceBlock.capabilities[0] !== "Generate standardized Eazo app scaffolds") {
+if (interfaceBlock.capabilities.length !== 3) throw new Error("wrong capabilities length");
+if (interfaceBlock.capabilities[0] !== "Generate standardized Eazo apps from the official template") {
   throw new Error("wrong first capability");
 }
-if (interfaceBlock.capabilities[1] !== "Validate plugin and marketplace metadata") {
+if (interfaceBlock.capabilities[1] !== "Create functional UI references with image generation") {
   throw new Error("wrong second capability");
+}
+if (interfaceBlock.capabilities[2] !== "Audit every interactive control with an independent reviewer") {
+  throw new Error("wrong third capability");
 }
 if (!Array.isArray(interfaceBlock.defaultPrompt)) throw new Error("defaultPrompt must be an array");
 if (interfaceBlock.defaultPrompt.length !== 1) throw new Error("wrong defaultPrompt length");
