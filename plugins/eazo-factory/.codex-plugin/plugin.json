@@ -1,0 +1,24 @@
+{
+  "name": "eazo-factory",
+  "version": "0.1.0",
+  "description": "Generate and review standardized Eazo apps with Codex.",
+  "author": {
+    "name": "EazoAI"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Eazo Factory",
+    "shortDescription": "Generate a polished, reviewed Eazo app from one prompt.",
+    "longDescription": "Eazo Factory turns one product prompt into a standardized Eazo app scaffold based on the official Eazo Next.js template, then verifies the result before handoff.",
+    "developerName": "EazoAI",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Generate standardized Eazo app scaffolds",
+      "Validate plugin and marketplace metadata"
+    ],
+    "defaultPrompt": [
+      "Use @eazo-factory to create one standardized Eazo app."
+    ],
+    "brandColor": "#2F5D50"
+  }
+}

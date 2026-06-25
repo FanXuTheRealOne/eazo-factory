@@ -1,0 +1,8 @@
+interface:
+  display_name: "Eazo Factory"
+  short_description: "Generate a polished, reviewed Eazo app from one prompt."
+  brand_color: "#2F5D50"
+  default_prompt: "Use @eazo-factory to create one standardized Eazo app."
+
+policy:
+  allow_implicit_invocation: false

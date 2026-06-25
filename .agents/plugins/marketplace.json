@@ -1,0 +1,20 @@
+{
+  "name": "eazo-tools",
+  "interface": {
+    "displayName": "Eazo Tools"
+  },
+  "plugins": [
+    {
+      "name": "eazo-factory",
+      "source": {
+        "source": "local",
+        "path": "./plugins/eazo-factory"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
