@@ -62,6 +62,7 @@ Use this exact shape:
       "control_id": "home-start-session",
       "feature_id": "breathing-session",
       "selector_or_description": "Primary button labeled Begin on home idle state",
+      "mapped_requirement": "Breathing session: a user can start and complete a timed session",
       "acceptance_reference": "product-spec.features[breathing-session].acceptance[0]",
       "acceptance_text": "A user can start and complete a timed session",
       "action": "Click the primary button after selecting a duration",
@@ -85,6 +86,7 @@ Use this exact shape:
 Rules:
 - `control_id` must match an `interaction-map.json` control id.
 - `feature_id` must match the `feature_id` on the audited `interaction-map.json` control and a `features.id` from `product-spec.json`.
+- `mapped_requirement` is required and must be a concise human-readable summary derived from `feature_id`, `acceptance_reference`, and `acceptance_text`.
 - `acceptance_reference` must point to the accepted requirement being verified.
 - `acceptance_text` must copy the exact acceptance text identified by `acceptance_reference`.
 - `status` should be `"pass"` or `"fail"`.

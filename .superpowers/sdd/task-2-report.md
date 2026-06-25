@@ -183,6 +183,7 @@ Addressed all requested High and Medium findings, plus the two Low contract-stab
   - `destination_reference` now carries the stable destination binding
 - Replaced free-text-only control audit mapping with stable references:
   - `feature_id`
+  - `mapped_requirement` restored as the required concise human-readable summary derived from the stable references
   - `acceptance_reference`
   - `acceptance_text`
 - Defined `total_score` explicitly and tied it to the exact category maxima and total maximum of 100.
@@ -268,3 +269,51 @@ PY
 Observed:
 - exited 0
 - output: `all-json-blocks-parse`
+
+## Strict-spec follow-up: restore `mapped_requirement`
+
+The shipped `control-audit.json` example temporarily omitted the required `mapped_requirement` field while the report still described it. Fixed by restoring `mapped_requirement` in every audit entry schema example and defining it normatively as a concise human-readable summary derived from `feature_id`, `acceptance_reference`, and `acceptance_text`.
+
+### RED baseline
+
+Commands run:
+
+```bash
+rg -n 'mapped_requirement' plugins/eazo-factory/references/review-rubric.md .superpowers/sdd/task-2-report.md
+python3 - <<'PY'
+from pathlib import Path
+text = Path('plugins/eazo-factory/references/review-rubric.md').read_text()
+start = text.index('## control-audit.json schema')
+section = text[start:]
+print('mapped_requirement_in_schema', 'mapped_requirement' in section.split('```json',1)[1].split('```',1)[0])
+PY
+```
+
+Observed:
+- `mapped_requirement` appeared in the report but not in the shipped schema example
+- Python check output: `mapped_requirement_in_schema False`
+
+### GREEN verification
+
+Commands run:
+
+```bash
+rg -n 'mapped_requirement|concise human-readable summary derived from `feature_id`, `acceptance_reference`, and `acceptance_text`' plugins/eazo-factory/references/review-rubric.md .superpowers/sdd/task-2-report.md
+python3 - <<'PY'
+from pathlib import Path
+import json,re
+text = Path('plugins/eazo-factory/references/review-rubric.md').read_text()
+start = text.index('## control-audit.json schema')
+section = text[start:]
+print('mapped_requirement_in_schema', 'mapped_requirement' in section.split('```json',1)[1].split('```',1)[0])
+for block in re.findall(r'```json\n(.*?)\n```', text, re.S):
+    json.loads(block)
+print('review-rubric-json-parse-pass')
+PY
+```
+
+Observed:
+- `mapped_requirement` now appears in both the shipped schema and the report
+- Python check output:
+  - `mapped_requirement_in_schema True`
+  - `review-rubric-json-parse-pass`
