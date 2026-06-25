@@ -136,6 +136,20 @@ run_scaffold() {
   bash "$PLUGIN_ROOT/scripts/scaffold-app.sh" "$output_root" "$slug"
 }
 
+run_scaffold_from_cwd() {
+  starter_dir="$1"
+  cwd="$2"
+  output_root="$3"
+  slug="$4"
+
+  (
+    cd "$cwd"
+    PATH="$FAKE_BIN:$PATH" \
+    EAZO_STARTER_PATH="$starter_dir" \
+    bash "$PLUGIN_ROOT/scripts/scaffold-app.sh" "$output_root" "$slug"
+  )
+}
+
 assert_empty_dir() {
   dir_path="$1"
   test -d "$dir_path"
@@ -163,6 +177,22 @@ test "$(cat "$HAPPY_OUTPUT_ROOT/test-app/AGENTS.md")" = "$(cat "$HAPPY_STARTER/A
 test "$(git -C "$HAPPY_OUTPUT_ROOT/test-app" remote | wc -l | tr -d ' ')" = "0"
 assert_package_name "$HAPPY_OUTPUT_ROOT/test-app/package.json" "test-app"
 assert_run_state "$HAPPY_OUTPUT_ROOT/test-app/factory-run.json" "in_progress" "scaffolded"
+
+RELATIVE_STARTER="$TMP_ROOT/fake-starter-relative"
+RELATIVE_CWD="$TMP_ROOT/relative-cwd"
+RELATIVE_OUTPUT_ROOT="relative-output"
+RELATIVE_DESTINATION="$RELATIVE_CWD/$RELATIVE_OUTPUT_ROOT/relative-app"
+create_fake_starter "$RELATIVE_STARTER" '"printf '\''relative cleanup marker\n'\''"'
+mkdir -p "$RELATIVE_CWD"
+
+run_scaffold_from_cwd "$RELATIVE_STARTER" "$RELATIVE_CWD" "$RELATIVE_OUTPUT_ROOT" "relative-app"
+
+test -f "$RELATIVE_DESTINATION/package.json"
+test -f "$RELATIVE_DESTINATION/factory-run.json"
+test -f "$RELATIVE_DESTINATION/review/cleanup-demo.log"
+grep -q "relative cleanup marker" "$RELATIVE_DESTINATION/review/cleanup-demo.log"
+assert_package_name "$RELATIVE_DESTINATION/package.json" "relative-app"
+assert_run_state "$RELATIVE_DESTINATION/factory-run.json" "in_progress" "scaffolded"
 
 SYMLINK_STARTER="$TMP_ROOT/fake-starter-symlink"
 SYMLINK_OUTPUT_ROOT="$TMP_ROOT/output-symlink"

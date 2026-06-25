@@ -31,3 +31,10 @@ Reviewer follow-up:
 
 Follow-up verification:
 - `bash plugins/eazo-factory/tests/test-scaffold.sh`
+
+Final regression follow-up:
+- Canonicalized the preflight-created output root to an absolute path before deriving the destination, run-state path, and cleanup log path.
+- Added a regression test that invokes `scaffold-app.sh` from a temporary working directory with a relative output root and verifies the cleanup log lands under the generated app directory while the final run state remains `in_progress` / `scaffolded`.
+
+Final verification:
+- `bash plugins/eazo-factory/tests/test-scaffold.sh`

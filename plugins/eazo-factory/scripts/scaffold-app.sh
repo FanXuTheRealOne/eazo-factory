@@ -62,8 +62,9 @@ NODE
 
 PREFLIGHT_JSON="$("$SCRIPT_DIR/preflight.sh" "$OUTPUT_ROOT" "$SLUG")"
 STARTER_SOURCE="$(node -e 'process.stdout.write(JSON.parse(process.argv[1]).starter_source)' "$PREFLIGHT_JSON")"
+ABSOLUTE_OUTPUT_ROOT="$(cd "$OUTPUT_ROOT" && pwd -P)"
 
-DESTINATION="$OUTPUT_ROOT/$SLUG"
+DESTINATION="$ABSOLUTE_OUTPUT_ROOT/$SLUG"
 RUN_STATE_PATH="$DESTINATION/factory-run.json"
 CLEANUP_LOG_PATH="$DESTINATION/review/cleanup-demo.log"
 
