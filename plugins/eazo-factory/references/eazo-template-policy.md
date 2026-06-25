@@ -16,6 +16,7 @@ Required reads before implementation:
 - only the capability examples selected in `product-spec.json`
 
 Policy:
+- The canonical starter template is `https://github.com/EazoAI/eazo-creator-nextjs-template.git` on branch `main`.
 - Follow higher-precedence sources when guidance conflicts.
 - Treat the checked-out template as the source of truth for runnable implementation details, scripts, and deployment wiring.
 - Use plugin references to constrain artifact shapes, review policy, and art direction when the template does not specify them.

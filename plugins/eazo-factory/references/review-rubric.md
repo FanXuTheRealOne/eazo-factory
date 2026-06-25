@@ -20,6 +20,7 @@ Use this exact shape:
   "visual_quality": 17,
   "control_behavior": 13,
   "control_necessity": 9,
+  "total_score": 88,
   "findings": [
     {
       "severity": "non_blocking",
@@ -34,6 +35,9 @@ Use this exact shape:
 Rules:
 - `verdict` is `"pass"` only when every gate condition above is satisfied.
 - `core_functionality`, `bugs`, `visual_quality`, `control_behavior`, and `control_necessity` are numeric category scores.
+- Category maximums are exact and cannot be exceeded: `core_functionality <= 30`, `bugs <= 25`, `visual_quality <= 20`, `control_behavior <= 15`, `control_necessity <= 10`.
+- `total_score` must equal the sum of `core_functionality + bugs + visual_quality + control_behavior + control_necessity`.
+- The exact maximum `total_score` is 100.
 - `findings` may be empty, but any finding with `severity: "blocking"` forces failure.
 
 ## control-audit.json schema
@@ -43,23 +47,52 @@ Use this exact shape:
 ```json
 {
   "schema_version": "1.0",
+  "interaction_map_control_ids": ["home-start-session"],
+  "discovered_interactive_elements": [
+    {
+      "element_id": "home-idle-primary-button",
+      "screen_state": "home:idle",
+      "selector_or_description": "Primary button labeled Begin on home idle state",
+      "mapped_control_id": "home-start-session",
+      "status": "mapped"
+    }
+  ],
   "entries": [
     {
       "control_id": "home-start-session",
+      "feature_id": "breathing-session",
       "selector_or_description": "Primary button labeled Begin on home idle state",
-      "mapped_requirement": "Start the selected breathing session",
+      "acceptance_reference": "product-spec.features[breathing-session].acceptance[0]",
+      "acceptance_text": "A user can start and complete a timed session",
       "action": "Click the primary button after selecting a duration",
       "observed_result": "Timer starts and paced breathing animation becomes visible",
       "status": "pass"
     }
-  ]
+  ],
+  "coverage": {
+    "interaction_map_control_count": 1,
+    "audited_control_count": 1,
+    "discovered_interactive_count": 1,
+    "mapped_discovered_interactive_count": 1,
+    "missing_control_ids": [],
+    "extra_control_ids": [],
+    "unmapped_discovered_interactive_elements": [],
+    "status": "pass"
+  }
 }
 ```
 
 Rules:
 - `control_id` must match an `interaction-map.json` control id.
-- `mapped_requirement` should mirror the intended requirement being verified.
+- `feature_id` must match the `feature_id` on the audited `interaction-map.json` control and a `features.id` from `product-spec.json`.
+- `acceptance_reference` must point to the accepted requirement being verified.
+- `acceptance_text` must copy the exact acceptance text identified by `acceptance_reference`.
 - `status` should be `"pass"` or `"fail"`.
+- `entries` must include exactly one or more audit entries for every `interaction-map.json` control as needed across states.
+- Compare the set of `interaction_map_control_ids` to the set of `entries.control_id`; fail if any control id is missing or extra.
+- Every visible discovered interactive element must appear in `discovered_interactive_elements` and map back to exactly one `interaction-map.json` control id.
+- Fail if `coverage.missing_control_ids`, `coverage.extra_control_ids`, or `coverage.unmapped_discovered_interactive_elements` are non-empty.
+- `coverage.status` is `"pass"` only when both compared control-id sets match exactly, all discovered interactive elements are mapped, and the four counts are internally consistent.
 
 ## Scoring guidance
 

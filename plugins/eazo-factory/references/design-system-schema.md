@@ -4,7 +4,7 @@ Purpose: stable contract for art direction, tokens, and component-level design c
 
 Rules:
 - Use the exact top-level keys shown below.
-- `art_direction` must point to one approved art-direction reference.
+- `art_direction` must be one of these approved slugs: `matisse-cut-paper`, `bauhaus-playful`, `quiet-editorial`.
 - Token values may vary by product, but the shape must remain stable.
 - `components` should cover only components required by the selected product capabilities and screens.
 

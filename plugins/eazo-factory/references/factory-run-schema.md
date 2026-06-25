@@ -5,8 +5,12 @@ Purpose: stable run-state contract for the current factory execution and produce
 Rules:
 - Use the exact field names and nesting below.
 - `status` and `stage` should be updated in place as work advances.
-- `artifacts` stores produced artifact paths or URLs by artifact name.
+- `starter.source` must be `https://github.com/EazoAI/eazo-creator-nextjs-template.git`.
+- `starter.branch` must be `main`.
+- `artifacts` stores produced artifact records keyed by artifact name.
+- Each artifact record must use the stable shape `{ "artifact_type", "path", "source_reference", "status", "updated_at" }`.
 - `verification` stores ordered verification records for the current run.
+- Each verification record must use the stable shape `{ "id", "kind", "name", "command", "status", "evidence", "ran_at" }`.
 
 ```json
 {
@@ -21,8 +25,26 @@ Rules:
     "branch": "main",
     "commit": ""
   },
-  "artifacts": {},
-  "verification": [],
+  "artifacts": {
+    "product_spec": {
+      "artifact_type": "json",
+      "path": "artifacts/product-spec.json",
+      "source_reference": "references/product-spec-schema.md",
+      "status": "ready",
+      "updated_at": "2026-06-25T00:00:00Z"
+    }
+  },
+  "verification": [
+    {
+      "id": "content-check-001",
+      "kind": "contract_check",
+      "name": "schema-version-reference-check",
+      "command": "rg -n '\"schema_version\": \"1.0\"' plugins/eazo-factory/references",
+      "status": "pass",
+      "evidence": "Six schema_version example matches found across artifact references.",
+      "ran_at": "2026-06-25T00:00:00Z"
+    }
+  ],
   "review_cycles": 0,
   "preview_url": null
 }
