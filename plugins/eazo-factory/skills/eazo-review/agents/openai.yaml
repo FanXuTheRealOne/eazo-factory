@@ -1,0 +1,4 @@
+interface:
+  display_name: "Eazo Review"
+  short_description: "Independently audit an Eazo app and every control."
+  default_prompt: "Use $eazo-review to independently test this Eazo app and audit every interactive control."

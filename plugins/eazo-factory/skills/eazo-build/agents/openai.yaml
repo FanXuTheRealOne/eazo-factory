@@ -1,0 +1,4 @@
+interface:
+  display_name: "Eazo Build"
+  short_description: "Implement an Eazo app from approved artifacts."
+  default_prompt: "Use $eazo-build to implement this scaffolded Eazo app from its product and design artifacts."
