@@ -113,3 +113,56 @@ GREEN:
 
 - The official validator depends on `yaml`, which was not installed in the system Python environment here. To run the official script, I used a temporary throwaway Python shim for `yaml.safe_load` instead of modifying the workspace or vendoring a dependency.
 - No plugin skills were created in Task 1, which is consistent with the task brief; later tasks will need to add the actual plugin behavior.
+
+## Follow-up fix evidence
+
+### Regression proof
+
+Before updating the committed test, I created an isolated temporary copy of the plugin files and intentionally changed the copied manifest so that:
+
+- `author.name` was not `EazoAI`
+- `interface.capabilities` no longer matched the required values
+
+Running the strengthened assertion script against that isolated copy failed immediately with:
+
+```text
+Error: wrong author name
+```
+
+That confirmed the new checks catch the intended regression without mutating the committed production manifest.
+
+### Updated test coverage
+
+`plugins/eazo-factory/tests/test-manifest.sh` now asserts:
+
+- `author.name === "EazoAI"`
+- `interface.displayName === "Eazo Factory"`
+- `interface.shortDescription` exact value
+- `interface.longDescription` exact value
+- `interface.developerName === "EazoAI"`
+- `interface.category === "Developer Tools"`
+- `interface.capabilities` is a 2-item string array with the exact task values
+- `interface.defaultPrompt` is a 1-item string array with the exact task value
+- `interface.brandColor === "#2F5D50"`
+
+### Re-run results after the fix
+
+```bash
+bash plugins/eazo-factory/tests/test-manifest.sh
+```
+
+Result:
+
+```text
+manifest test passed
+```
+
+```bash
+python3 /Users/xufan/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py plugins/eazo-factory
+```
+
+Result:
+
+```text
+Plugin validation passed: /Users/xufan/Desktop/eazo-factory/.worktrees/plugin-implementation/plugins/eazo-factory
+```

@@ -15,6 +15,38 @@ const manifest = JSON.parse(
 if (manifest.name !== "eazo-factory") throw new Error("wrong plugin name");
 if (manifest.version !== "0.1.0") throw new Error("wrong plugin version");
 if (manifest.skills !== "./skills/") throw new Error("wrong skills path");
+if (manifest.author?.name !== "EazoAI") throw new Error("wrong author name");
+
+const interfaceBlock = manifest.interface;
+if (!interfaceBlock || typeof interfaceBlock !== "object") {
+  throw new Error("missing interface block");
+}
+if (interfaceBlock.displayName !== "Eazo Factory") throw new Error("wrong displayName");
+if (interfaceBlock.shortDescription !== "Generate a polished, reviewed Eazo app from one prompt.") {
+  throw new Error("wrong shortDescription");
+}
+if (
+  interfaceBlock.longDescription !==
+  "Eazo Factory turns one product prompt into a standardized Eazo app scaffold based on the official Eazo Next.js template, then verifies the result before handoff."
+) {
+  throw new Error("wrong longDescription");
+}
+if (interfaceBlock.developerName !== "EazoAI") throw new Error("wrong developerName");
+if (interfaceBlock.category !== "Developer Tools") throw new Error("wrong category");
+if (!Array.isArray(interfaceBlock.capabilities)) throw new Error("capabilities must be an array");
+if (interfaceBlock.capabilities.length !== 2) throw new Error("wrong capabilities length");
+if (interfaceBlock.capabilities[0] !== "Generate standardized Eazo app scaffolds") {
+  throw new Error("wrong first capability");
+}
+if (interfaceBlock.capabilities[1] !== "Validate plugin and marketplace metadata") {
+  throw new Error("wrong second capability");
+}
+if (!Array.isArray(interfaceBlock.defaultPrompt)) throw new Error("defaultPrompt must be an array");
+if (interfaceBlock.defaultPrompt.length !== 1) throw new Error("wrong defaultPrompt length");
+if (interfaceBlock.defaultPrompt[0] !== "Use @eazo-factory to create one standardized Eazo app.") {
+  throw new Error("wrong defaultPrompt value");
+}
+if (interfaceBlock.brandColor !== "#2F5D50") throw new Error("wrong brandColor");
 
 const marketplace = JSON.parse(
   fs.readFileSync(path.join(repoRoot, ".agents/plugins/marketplace.json"), "utf8"),
