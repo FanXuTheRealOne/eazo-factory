@@ -179,7 +179,28 @@ node - "$RUN_STATE_DIR/factory-run.json" <<'NODE'
 const fs = require("node:fs");
 const run = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
 if (run.stage !== "idea") throw new Error("run state did not update");
+if (!Array.isArray(run.stage_history) || run.stage_history.length !== 2) {
+  throw new Error("stage history was not appended");
+}
 NODE
+
+SYMLINK_RUN_ROOT="$TMP_ROOT/run-state-symlink"
+SYMLINK_RUN_TARGET="$TMP_ROOT/run-state-external.json"
+mkdir -p "$SYMLINK_RUN_ROOT/.eazo-factory-runs/linked-app"
+printf '{"protected":true}\n' >"$SYMLINK_RUN_TARGET"
+ln -s "$SYMLINK_RUN_TARGET" \
+  "$SYMLINK_RUN_ROOT/.eazo-factory-runs/linked-app/factory-run.json"
+if bash "$PLUGIN_ROOT/scripts/init-run.sh" "$SYMLINK_RUN_ROOT" "linked-app" >/dev/null 2>&1; then
+  echo "expected symlink run state initialization to fail" >&2
+  exit 1
+fi
+if bash "$PLUGIN_ROOT/scripts/update-run.sh" \
+  "$SYMLINK_RUN_ROOT/.eazo-factory-runs/linked-app/factory-run.json" \
+  "idea" >/dev/null 2>&1; then
+  echo "expected symlink run state update to fail" >&2
+  exit 1
+fi
+grep -q '"protected":true' "$SYMLINK_RUN_TARGET"
 
 HAPPY_STARTER="$TMP_ROOT/fake-starter-happy"
 HAPPY_OUTPUT_ROOT="$TMP_ROOT/output-happy"
@@ -187,6 +208,10 @@ create_fake_starter "$HAPPY_STARTER" '"rm -rf demo-only.txt demo-dir"'
 mkdir -p "$HAPPY_OUTPUT_ROOT"
 
 run_scaffold "$HAPPY_STARTER" "$HAPPY_OUTPUT_ROOT" "test-app"
+
+bash "$PLUGIN_ROOT/scripts/merge-run-state.sh" \
+  "$RUN_STATE_DIR/factory-run.json" \
+  "$HAPPY_OUTPUT_ROOT/test-app/factory-run.json"
 
 test -f "$HAPPY_OUTPUT_ROOT/test-app/package.json"
 test -f "$HAPPY_OUTPUT_ROOT/test-app/factory-run.json"
@@ -202,6 +227,13 @@ test "$(cat "$HAPPY_OUTPUT_ROOT/test-app/AGENTS.md")" = "$(cat "$HAPPY_STARTER/A
 test "$(git -C "$HAPPY_OUTPUT_ROOT/test-app" remote | wc -l | tr -d ' ')" = "0"
 assert_package_name "$HAPPY_OUTPUT_ROOT/test-app/package.json" "test-app"
 assert_run_state "$HAPPY_OUTPUT_ROOT/test-app/factory-run.json" "in_progress" "scaffolded"
+node - "$HAPPY_OUTPUT_ROOT/test-app/factory-run.json" <<'NODE'
+const fs = require("node:fs");
+const run = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+if (!Array.isArray(run.stage_history) || run.stage_history.length < 3) {
+  throw new Error("staging stage history was not merged");
+}
+NODE
 
 RELATIVE_STARTER="$TMP_ROOT/fake-starter-relative"
 RELATIVE_CWD="$TMP_ROOT/relative-cwd"

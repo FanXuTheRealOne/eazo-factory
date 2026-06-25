@@ -13,6 +13,7 @@ INCREMENT_REVIEW="${5:-0}"
 
 [ -n "$RUN_PATH" ] || die "usage: update-run.sh RUN_PATH STAGE [STATUS] [PREVIEW_URL] [INCREMENT_REVIEW]"
 [ -n "$STAGE" ] || die "usage: update-run.sh RUN_PATH STAGE [STATUS] [PREVIEW_URL] [INCREMENT_REVIEW]"
+[ ! -L "$RUN_PATH" ] || die "run state must not be a symlink: $RUN_PATH"
 [ -f "$RUN_PATH" ] || die "run state does not exist: $RUN_PATH"
 case "$INCREMENT_REVIEW" in
   0|1) ;;
@@ -28,11 +29,19 @@ const status = process.argv[4];
 const previewUrl = process.argv[5];
 const incrementReview = process.argv[6] === "1";
 const now = process.argv[7];
+const directory = require("node:path").dirname(runPath);
 const run = JSON.parse(fs.readFileSync(runPath, "utf8"));
 run.stage = stage;
 run.status = status;
 run.updated_at = now;
+run.stage_history = Array.isArray(run.stage_history) ? run.stage_history : [];
+run.stage_history.push({ stage, status, entered_at: now });
 if (previewUrl) run.preview_url = previewUrl;
 if (incrementReview) run.review_cycles = Number(run.review_cycles ?? 0) + 1;
-fs.writeFileSync(runPath, JSON.stringify(run, null, 2) + "\n");
+const tempPath = require("node:path").join(
+  directory,
+  `.factory-run.json.${process.pid}.${Date.now()}.tmp`,
+);
+fs.writeFileSync(tempPath, JSON.stringify(run, null, 2) + "\n", { flag: "wx" });
+fs.renameSync(tempPath, runPath);
 NODE

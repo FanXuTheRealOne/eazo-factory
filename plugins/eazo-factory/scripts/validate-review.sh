@@ -40,14 +40,48 @@ function sameSet(left, right) {
 }
 
 const interactionMap = read("design/interaction-map.json");
+const productSpec = read("product-spec.json");
+const verification = read("review/verification.json");
 const review = read("review/review.json");
 const audit = read("review/control-audit.json");
+
+for (const [name, payload] of [
+  ["product-spec.json", productSpec],
+  ["design/interaction-map.json", interactionMap],
+  ["review/verification.json", verification],
+  ["review/review.json", review],
+  ["review/control-audit.json", audit],
+]) {
+  if (payload?.schema_version !== "1.0") {
+    errors.push(`${name}: schema_version must be 1.0`);
+  }
+}
 
 const controlIds = Array.isArray(interactionMap?.controls)
   ? interactionMap.controls.map((control) => control?.id).filter((id) => typeof id === "string")
   : [];
 if (!interactionMap || !Array.isArray(interactionMap.controls)) {
   errors.push("design/interaction-map.json: controls must be an array");
+} else if (interactionMap.controls.length === 0) {
+  errors.push("design/interaction-map.json: controls must not be empty");
+}
+const features = new Map(
+  Array.isArray(productSpec?.features)
+    ? productSpec.features
+      .filter((feature) => typeof feature?.id === "string")
+      .map((feature) => [feature.id, feature])
+    : [],
+);
+const controls = new Map(
+  Array.isArray(interactionMap?.controls)
+    ? interactionMap.controls
+      .filter((control) => typeof control?.id === "string")
+      .map((control) => [control.id, control])
+    : [],
+);
+if (features.size === 0) errors.push("product-spec.json: features must not be empty");
+if (controls.size !== controlIds.length) {
+  errors.push("design/interaction-map.json: control IDs must be unique and non-empty");
 }
 
 const scoreFields = {
@@ -79,6 +113,11 @@ const allowedSeverities = new Set(["blocking", "important", "non_blocking"]);
 for (const finding of review?.findings ?? []) {
   if (!allowedSeverities.has(finding?.severity)) {
     errors.push(`review/review.json: invalid finding severity ${finding?.severity}`);
+  }
+  for (const field of ["summary", "evidence", "required_action"]) {
+    if (typeof finding?.[field] !== "string" || !finding[field].trim()) {
+      errors.push(`review/review.json: finding missing ${field}`);
+    }
   }
 }
 
@@ -113,6 +152,22 @@ for (const entry of audit?.entries ?? []) {
       errors.push(`review/control-audit.json: ${entry?.control_id ?? "entry"} missing ${field}`);
     }
   }
+  const control = controls.get(entry?.control_id);
+  const feature = features.get(entry?.feature_id);
+  if (!control || control.feature_id !== entry?.feature_id || !feature) {
+    errors.push(`review/control-audit.json: invalid feature mapping for ${entry?.control_id}`);
+  } else {
+    const acceptanceMatch = entry.acceptance_reference?.match(
+      /^product-spec\.features\[([^\]]+)\]\.acceptance\[(\d+)\]$/,
+    );
+    const acceptanceIndex = acceptanceMatch ? Number(acceptanceMatch[2]) : -1;
+    const expectedAcceptance = acceptanceMatch && acceptanceMatch[1] === entry.feature_id
+      ? feature.acceptance?.[acceptanceIndex]
+      : undefined;
+    if (typeof expectedAcceptance !== "string" || entry.acceptance_text !== expectedAcceptance) {
+      errors.push(`review/control-audit.json: invalid acceptance reference for ${entry?.control_id}`);
+    }
+  }
 }
 
 if (!Array.isArray(audit?.discovered_interactive_elements)) {
@@ -141,6 +196,30 @@ const discoveredProductIds = (audit?.discovered_interactive_elements ?? [])
   .map((element) => element?.mapped_control_id);
 if (!sameSet([...new Set(discoveredProductIds)], controlIds)) {
   errors.push("review/control-audit.json: discovered product controls must cover the interaction map exactly");
+}
+const sourceInventory = Array.isArray(verification?.source_control_inventory)
+  ? verification.source_control_inventory
+  : [];
+const sourceProductIds = sourceInventory
+  .filter((element) => element?.owner === "product")
+  .map((element) => element?.id);
+if (!sameSet([...new Set(sourceProductIds)], controlIds)) {
+  errors.push("review/verification.json: source product controls must cover the interaction map exactly");
+}
+const sourceSdkIds = [...new Set(
+  sourceInventory
+    .filter((element) => element?.owner === "eazo_sdk")
+    .map((element) => element?.id),
+)];
+const discoveredSdkIds = [...new Set(
+  (audit?.discovered_interactive_elements ?? [])
+    .filter((element) => element?.owner === "eazo_sdk")
+    .map((element) => element?.sdk_reference),
+)];
+for (const sdkId of sourceSdkIds) {
+  if (!discoveredSdkIds.includes(sdkId)) {
+    errors.push(`review/control-audit.json: missing reachable SDK control ${sdkId}`);
+  }
 }
 
 const coverage = audit?.coverage;
@@ -174,17 +253,20 @@ if (!coverage || typeof coverage !== "object") {
   }
 }
 
-const blocking = (review?.findings ?? []).some((finding) => finding?.severity === "blocking");
+const unresolvedRequiredFinding = (review?.findings ?? []).some(
+  (finding) => finding?.severity === "blocking" || finding?.severity === "important",
+);
 const allEntriesPass = (audit?.entries ?? []).every((entry) => entry?.status === "pass");
 const cleanCoverage = audit?.coverage?.status === "pass" &&
   (audit?.coverage?.missing_control_ids?.length ?? -1) === 0 &&
   (audit?.coverage?.extra_control_ids?.length ?? -1) === 0 &&
   (audit?.coverage?.unmapped_discovered_interactive_elements?.length ?? -1) === 0;
 const passConditions = review?.verdict === "pass" &&
+  verification?.status === "pass" &&
   review?.total_score >= 85 &&
   review?.core_functionality >= 25 &&
   review?.bugs >= 20 &&
-  !blocking &&
+  !unresolvedRequiredFinding &&
   allEntriesPass &&
   cleanCoverage;
 

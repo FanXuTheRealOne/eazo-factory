@@ -75,7 +75,7 @@ The app cannot pass unless:
 - total score is at least 85;
 - core functionality is at least 25/30;
 - bugs/runtime correctness is at least 20/25;
-- no blocking finding exists;
+- no blocking or important finding exists;
 - coverage status is `pass`;
 - every interactive control audit entry passes.
 

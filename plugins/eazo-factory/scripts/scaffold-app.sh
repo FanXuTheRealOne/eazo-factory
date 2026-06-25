@@ -43,6 +43,13 @@ const payload = {
   plugin_version: pluginVersion,
   status,
   stage,
+  stage_history: [
+    {
+      stage,
+      status,
+      entered_at: updatedAt,
+    },
+  ],
   started_at: startedAt,
   updated_at: updatedAt,
   starter: {

@@ -5,6 +5,7 @@ Purpose: stable run-state contract for the current factory execution and produce
 Rules:
 - Use the exact field names and nesting below.
 - `status` and `stage` should be updated in place as work advances.
+- `stage_history` is append-only and records every transition as `{ "stage", "status", "entered_at" }`.
 - `starter.source` must be `https://github.com/EazoAI/eazo-creator-nextjs-template.git`.
 - `starter.branch` must be `main`.
 - `artifacts` stores produced artifact records keyed by artifact name.
@@ -18,6 +19,18 @@ Rules:
   "plugin_version": "0.1.0",
   "status": "in_progress",
   "stage": "design",
+  "stage_history": [
+    {
+      "stage": "preflight",
+      "status": "in_progress",
+      "entered_at": "2026-06-25T00:00:00Z"
+    },
+    {
+      "stage": "design",
+      "status": "in_progress",
+      "entered_at": "2026-06-25T00:02:00Z"
+    }
+  ],
   "started_at": "2026-06-25T00:00:00Z",
   "updated_at": "2026-06-25T00:00:00Z",
   "starter": {

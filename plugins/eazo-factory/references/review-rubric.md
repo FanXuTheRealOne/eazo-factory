@@ -2,7 +2,7 @@
 
 This review is a hard gate. A run passes only if all of the following are true:
 - score at least 85;
-- no blocking findings;
+- no blocking or important findings;
 - every `control-audit.json` entry passes;
 - core functionality at least 25/30;
 - bugs at least 20/25.
@@ -40,7 +40,7 @@ Rules:
 - Category maximums are exact and cannot be exceeded: `core_functionality <= 30`, `bugs <= 25`, `visual_quality <= 20`, `control_behavior <= 15`, `control_necessity <= 10`.
 - `total_score` must equal the sum of `core_functionality + bugs + visual_quality + control_behavior + control_necessity`.
 - The exact maximum `total_score` is 100.
-- `findings` may be empty, but any finding with `severity: "blocking"` forces failure.
+- `findings` may be empty, but any finding with `severity: "blocking"` or `"important"` forces failure.
 
 ## control-audit.json schema
 

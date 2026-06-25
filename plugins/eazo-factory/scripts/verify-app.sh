@@ -50,6 +50,62 @@ function walk(dir) {
   return files;
 }
 
+function stripComments(text) {
+  return text
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/(^|[^:])\/\/.*$/gm, "$1");
+}
+
+function unique(values) {
+  return [...new Set(values)];
+}
+
+function crc32(buffer) {
+  let crc = 0xffffffff;
+  for (const byte of buffer) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit += 1) {
+      crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
+    }
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+function validPng(image) {
+  const signature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  if (image.length < 45 || !image.subarray(0, 8).equals(signature)) return false;
+  let offset = 8;
+  let chunkCount = 0;
+  let sawIhdr = false;
+  let sawIdat = false;
+  let sawIend = false;
+  while (offset + 12 <= image.length) {
+    const length = image.readUInt32BE(offset);
+    const end = offset + 12 + length;
+    if (end > image.length) return false;
+    const type = image.subarray(offset + 4, offset + 8);
+    const data = image.subarray(offset + 8, offset + 8 + length);
+    const expectedCrc = image.readUInt32BE(offset + 8 + length);
+    if (crc32(Buffer.concat([type, data])) !== expectedCrc) return false;
+    const typeName = type.toString("ascii");
+    if (chunkCount === 0) {
+      if (typeName !== "IHDR" || length !== 13) return false;
+      if (data.readUInt32BE(0) === 0 || data.readUInt32BE(4) === 0) return false;
+      sawIhdr = true;
+    }
+    if (typeName === "IDAT") sawIdat = true;
+    if (typeName === "IEND") {
+      if (length !== 0 || end !== image.length) return false;
+      sawIend = true;
+      offset = end;
+      break;
+    }
+    offset = end;
+    chunkCount += 1;
+  }
+  return sawIhdr && sawIdat && sawIend && offset === image.length;
+}
+
 const requiredFiles = [
   "package.json",
   "AGENTS.md",
@@ -85,8 +141,7 @@ if (pkg) {
 const imagePath = path.join(appDir, "design/ui-reference.png");
 if (fs.existsSync(imagePath)) {
   const image = fs.readFileSync(imagePath);
-  const pngSignature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
-  if (image.length < 24 || !image.subarray(0, 8).equals(pngSignature)) {
+  if (!validPng(image)) {
     add("invalid_ui_reference", "design/ui-reference.png must be a real PNG image", "design/ui-reference.png");
   }
 }
@@ -94,8 +149,8 @@ if (fs.existsSync(imagePath)) {
 const run = fs.existsSync(path.join(appDir, "factory-run.json"))
   ? readJson("factory-run.json")
   : null;
-if (run && (!run.starter || typeof run.starter.commit !== "string" || !run.starter.commit.trim())) {
-  add("missing_starter_commit", "factory-run.json starter.commit must be non-empty", "factory-run.json");
+if (run && (!run.starter || !/^[0-9a-f]{40}$/.test(run.starter.commit ?? ""))) {
+  add("missing_starter_commit", "factory-run.json starter.commit must be a full 40-character Git commit", "factory-run.json");
 }
 if (run?.starter?.source !== "https://github.com/EazoAI/eazo-creator-nextjs-template.git" ||
     run?.starter?.branch !== "main") {
@@ -119,22 +174,64 @@ const sourceFiles = walk(sourceRoot).filter((file) => /\.(?:[cm]?[jt]sx?|json)$/
 const sourceText = sourceFiles
   .map((file) => {
     const text = fs.readFileSync(file, "utf8");
-    return { file, relative: path.relative(appDir, file), text };
+    return { file, relative: path.relative(appDir, file), text, clean: stripComments(text) };
   });
+const sourceByFile = new Map(sourceText.map((item) => [item.file, item]));
+
+function resolveImport(fromFile, specifier) {
+  let base;
+  if (specifier.startsWith("@/")) base = path.join(sourceRoot, specifier.slice(2));
+  else if (specifier.startsWith(".")) base = path.resolve(path.dirname(fromFile), specifier);
+  else return null;
+  for (const candidate of [
+    base,
+    ...[".ts", ".tsx", ".js", ".jsx"].map((extension) => `${base}${extension}`),
+    ...["index.ts", "index.tsx", "index.js", "index.jsx"].map((name) => path.join(base, name)),
+  ]) {
+    if (sourceByFile.has(candidate)) return candidate;
+  }
+  return null;
+}
+
+function importedFiles(item) {
+  const imports = [];
+  const pattern = /(?:import|export)\s+(?:[\s\S]*?\s+from\s+)?["']([^"']+)["']|import\s*\(\s*["']([^"']+)["']\s*\)/g;
+  let match;
+  while ((match = pattern.exec(item.clean))) {
+    const resolved = resolveImport(item.file, match[1] ?? match[2]);
+    if (resolved) imports.push(resolved);
+  }
+  return unique(imports);
+}
+
+const dependencies = new Map(sourceText.map((item) => [item.file, importedFiles(item)]));
+const entryFiles = sourceText
+  .filter((item) => /^src\/app\/.*(?:page|layout|error|not-found|loading)\.[cm]?[jt]sx?$/.test(item.relative))
+  .map((item) => item.file);
+const reachableFiles = new Set();
+const pendingFiles = [...entryFiles];
+while (pendingFiles.length) {
+  const current = pendingFiles.pop();
+  if (!current || reachableFiles.has(current)) continue;
+  reachableFiles.add(current);
+  pendingFiles.push(...(dependencies.get(current) ?? []));
+}
 
 const layout = sourceText.find((item) => item.relative === "src/app/layout.tsx");
 if (layout) {
-  for (const requiredToken of [
-    "EazoProvider",
-    "I18nProvider",
-    "UserSyncEffect",
-    "NEXT_PUBLIC_APP_TITLE",
-    "NEXT_PUBLIC_APP_DESCRIPTION",
-  ]) {
-    if (!layout.text.includes(requiredToken)) {
+  const requiredLayoutPatterns = [
+    [/\bimport\s*\{\s*EazoProvider\s*\}\s*from\s*["']@eazo\/sdk\/react["']/, "official EazoProvider import"],
+    [/\bimport\s*\{\s*I18nProvider\s*\}\s*from\s*["']@\/components\/i18n\/i18n-provider["']/, "official I18nProvider import"],
+    [/\bimport\s*\{\s*UserSyncEffect\s*\}\s*from\s*["']@\/components\/user-profile\/user-sync-effect["']/, "official UserSyncEffect import"],
+    [/\bprocess\.env\.NEXT_PUBLIC_APP_TITLE\b/, "NEXT_PUBLIC_APP_TITLE metadata"],
+    [/\bprocess\.env\.NEXT_PUBLIC_APP_DESCRIPTION\b/, "NEXT_PUBLIC_APP_DESCRIPTION metadata"],
+    [/<I18nProvider\b[\s\S]*<EazoProvider\b[\s\S]*<UserSyncEffect\b/, "official provider nesting"],
+  ];
+  for (const [pattern, label] of requiredLayoutPatterns) {
+    if (!pattern.test(layout.clean)) {
       add(
         "missing_template_shell",
-        `src/app/layout.tsx must preserve ${requiredToken}`,
+        `src/app/layout.tsx must preserve ${label}`,
         "src/app/layout.tsx",
       );
     }
@@ -171,27 +268,74 @@ for (const envName of [".env", ".env.local", ".env.production", ".env.developmen
   }
 }
 
+function directlyUsesAi(item) {
+  return /import\s*\{[^}]*\bai(?:\s+as\s+\w+)?\b[^}]*\}\s*from\s*["']@eazo\/sdk["']/.test(item.clean) ||
+    /import\s+\*\s+as\s+(\w+)\s+from\s*["']@eazo\/sdk["'][\s\S]*?\b\1\.ai\b/.test(item.clean) ||
+    /import\s*\(\s*["']@eazo\/sdk["']\s*\)[\s\S]*?\.ai\b/.test(item.clean);
+}
+
+function dependencyClosure(startFile) {
+  const result = new Set();
+  const queue = [startFile];
+  while (queue.length) {
+    const current = queue.pop();
+    if (!current || result.has(current)) continue;
+    result.add(current);
+    queue.push(...(dependencies.get(current) ?? []));
+  }
+  return result;
+}
+
+function exportedRouteHandlerBodies(text) {
+  const bodies = [];
+  const pattern = /export\s+(?:async\s+)?function\s+(GET|POST|PUT|PATCH|DELETE)\s*\([^)]*\)\s*\{/g;
+  let match;
+  while ((match = pattern.exec(text))) {
+    const bodyStart = pattern.lastIndex;
+    let depth = 1;
+    let cursor = bodyStart;
+    while (cursor < text.length && depth > 0) {
+      if (text[cursor] === "{") depth += 1;
+      else if (text[cursor] === "}") depth -= 1;
+      cursor += 1;
+    }
+    if (depth === 0) bodies.push({ method: match[1], body: text.slice(bodyStart, cursor - 1) });
+  }
+  return bodies;
+}
+
 for (const item of sourceText) {
-  const isClient = /(?:^|\n)\s*["']use client["'];?/.test(item.text);
-  const importsAi =
-    /import\s*\{[^}]*\bai\b[^}]*\}\s*from\s*["']@eazo\/sdk["']/.test(item.text) ||
-    /import\s+ai\s+from\s*["']@eazo\/sdk["']/.test(item.text) ||
-    /import\s+\*\s+as\s+\w+\s+from\s*["']@eazo\/sdk["'][\s\S]*?\.\s*ai\b/.test(item.text) ||
-    /import\s*\(\s*["']@eazo\/sdk["']\s*\)[\s\S]*?\.\s*ai\b/.test(item.text);
-  if (isClient && importsAi) {
+  const isClient = /(?:^|\n)\s*["']use client["'];?/.test(item.clean);
+  const closure = dependencyClosure(item.file);
+  const usesAi = [...closure].some((file) => directlyUsesAi(sourceByFile.get(file)));
+  if (isClient && usesAi) {
     add(
       "client_ai_import",
-      "Client components must not import Eazo ai",
+      "Client components must not import Eazo ai directly or transitively",
       item.relative,
     );
   }
 
-  if (item.relative.startsWith("src/app/api/") && importsAi && !item.text.includes("requireAuth")) {
-    add(
-      "unguarded_ai_route",
-      "API routes using Eazo ai must call requireAuth",
-      item.relative,
+  if (/^src\/app\/api\/.*\/route\.[cm]?[jt]s$/.test(item.relative) && usesAi) {
+    const authImport = item.clean.match(
+      /import\s*\{([^}]*)\}\s*from\s*["']@eazo\/sdk["']/,
     );
+    const requireAuthBinding = authImport?.[1]
+      ?.split(",")
+      .map((part) => part.trim())
+      .map((part) => part.match(/^requireAuth(?:\s+as\s+(\w+))?$/))
+      .find(Boolean);
+    const authName = requireAuthBinding ? (requireAuthBinding[1] || "requireAuth") : null;
+    const handlers = exportedRouteHandlerBodies(item.clean);
+    const everyHandlerAuthenticated = handlers.length > 0 &&
+      handlers.every(({ body }) => authName && new RegExp(`\\b${authName}\\s*\\(`).test(body));
+    if (!everyHandlerAuthenticated) {
+      add(
+        "unguarded_ai_route",
+        "Every exported handler in an API route using Eazo ai must import and call requireAuth inside the handler",
+        item.relative,
+      );
+    }
   }
 
   const deadPatterns = [
@@ -215,7 +359,61 @@ for (const item of sourceText) {
 const interactionMap = fs.existsSync(path.join(appDir, "design/interaction-map.json"))
   ? readJson("design/interaction-map.json")
   : null;
-if (interactionMap && Array.isArray(interactionMap.controls)) {
+const sourceControlInventory = [];
+for (const item of sourceText.filter((candidate) => reachableFiles.has(candidate.file))) {
+  if (item.relative.startsWith("src/components/ui/")) continue;
+  const openingTags = item.clean.match(/<[A-Za-z][\w.:-]*\b[^>]*>/gs) ?? [];
+  for (const openingTag of openingTags) {
+    const tag = openingTag.match(/^<([A-Za-z][\w.:-]*)\b/)?.[1] ?? "";
+    const lowerTag = tag.toLowerCase();
+    const nativeInteractive =
+      lowerTag === "button" ||
+      ["input", "select", "textarea"].includes(lowerTag) ||
+      (lowerTag === "a" && /\bhref\s*=/.test(openingTag));
+    const explicitInteractive =
+      /\b(onClick|onSubmit|formAction|href)\s*=/.test(openingTag) ||
+      /\btype\s*=\s*["']submit["']/.test(openingTag) ||
+      /\brole\s*=\s*["']button["']/.test(openingTag);
+    const namedInteractive = /(?:Button|Link|Toggle|Switch|Tab|Select|Input|Textarea|Checkbox|Radio|MenuItem)$/.test(tag);
+    if (!nativeInteractive && !explicitInteractive && !namedInteractive) continue;
+    const productId = openingTag.match(/\bdata-control-id\s*=\s*["']([^"']+)["']/)?.[1] ?? null;
+    const sdkId = openingTag.match(/\bdata-eazo-sdk-control\s*=\s*["']([^"']+)["']/)?.[1] ?? null;
+    if ((productId && sdkId) || (!productId && !sdkId)) {
+      add(
+        "unmapped_source_control",
+        "Every reachable interactive element must declare exactly one literal data-control-id or data-eazo-sdk-control",
+        item.relative,
+      );
+      continue;
+    }
+    sourceControlInventory.push({
+      owner: productId ? "product" : "eazo_sdk",
+      id: productId ?? sdkId,
+      file: item.relative,
+    });
+  }
+}
+
+if (!interactionMap || interactionMap.schema_version !== "1.0" || !Array.isArray(interactionMap.controls)) {
+  add("invalid_interaction_map", "interaction-map.json must use schema_version 1.0 and a controls array", "design/interaction-map.json");
+} else if (interactionMap.controls.length === 0) {
+  add("empty_interaction_map", "interaction-map.json must define at least one product control", "design/interaction-map.json");
+} else {
+  const mapIds = interactionMap.controls
+    .map((control) => control?.id)
+    .filter((id) => typeof id === "string" && id.trim());
+  const sourceProductIds = unique(
+    sourceControlInventory.filter((control) => control.owner === "product").map((control) => control.id),
+  );
+  if (unique(mapIds).length !== mapIds.length) {
+    add("duplicate_control_id", "interaction-map control IDs must be unique", "design/interaction-map.json");
+  }
+  for (const extraId of sourceProductIds.filter((id) => !mapIds.includes(id))) {
+    add("extra_source_control", `Source control is not declared in interaction-map.json: ${extraId}`);
+  }
+  for (const missingId of mapIds.filter((id) => !sourceProductIds.includes(id))) {
+    add("missing_control_implementation", `Interaction control is not rendered: ${missingId}`, "design/interaction-map.json");
+  }
   for (const control of interactionMap.controls) {
     if (!control || typeof control.id !== "string" || !control.id.trim()) {
       add("invalid_control_id", "Every interaction-map control needs a non-empty id", "design/interaction-map.json");
@@ -264,7 +462,10 @@ if (interactionMap && Array.isArray(interactionMap.controls)) {
   }
 }
 
-fs.writeFileSync(outputPath, JSON.stringify({ findings }, null, 2) + "\n");
+fs.writeFileSync(
+  outputPath,
+  JSON.stringify({ findings, source_control_inventory: sourceControlInventory }, null, 2) + "\n",
+);
 NODE
 
 set +e
@@ -310,6 +511,7 @@ if (buildExit !== 0) {
 const payload = {
   schema_version: "1.0",
   status: findings.length === 0 ? "pass" : "fail",
+  source_control_inventory: staticResult.source_control_inventory ?? [],
   commands: [
     { name: "lint", command: "bun run lint", exit_code: lintExit, log: "review/lint.log" },
     { name: "build", command: "bun run build", exit_code: buildExit, log: "review/build.log" },

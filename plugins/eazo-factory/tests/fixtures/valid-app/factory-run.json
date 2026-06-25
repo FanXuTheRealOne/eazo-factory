@@ -3,6 +3,6 @@
   "starter": {
     "source": "https://github.com/EazoAI/eazo-creator-nextjs-template.git",
     "branch": "main",
-    "commit": "abc123"
+    "commit": "0067f106872c7f5372916e4fdbd7455eee006a38"
   }
 }

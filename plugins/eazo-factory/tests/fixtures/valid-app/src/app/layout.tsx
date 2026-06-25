@@ -1,17 +1,9 @@
+import { EazoProvider } from "@eazo/sdk/react";
+import { I18nProvider } from "@/components/i18n/i18n-provider";
+import { UserSyncEffect } from "@/components/user-profile/user-sync-effect";
+
 const title = process.env.NEXT_PUBLIC_APP_TITLE;
 const description = process.env.NEXT_PUBLIC_APP_DESCRIPTION;
-
-export function I18nProvider({ children }: { children: React.ReactNode }) {
-  return children;
-}
-
-export function EazoProvider({ children }: { children: React.ReactNode }) {
-  return children;
-}
-
-export function UserSyncEffect() {
-  return null;
-}
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

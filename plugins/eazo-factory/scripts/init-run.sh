@@ -21,6 +21,7 @@ RUN_PATH="$RUN_DIR/factory-run.json"
 [ ! -L "$RUNS_ROOT" ] || die "runs root must not be a symlink: $RUNS_ROOT"
 mkdir -p "$RUNS_ROOT"
 [ ! -L "$RUN_DIR" ] || die "run directory must not be a symlink: $RUN_DIR"
+[ ! -L "$RUN_PATH" ] || die "run state must not be a symlink: $RUN_PATH"
 
 if [ -f "$RUN_PATH" ]; then
   printf '%s\n' "$RUN_DIR"
@@ -41,6 +42,13 @@ const payload = {
   plugin_version: "0.1.0",
   status: "in_progress",
   stage: "preflight",
+  stage_history: [
+    {
+      stage: "preflight",
+      status: "in_progress",
+      entered_at: now,
+    },
+  ],
   started_at: now,
   updated_at: now,
   starter: {
@@ -53,7 +61,7 @@ const payload = {
   review_cycles: 0,
   preview_url: null,
 };
-fs.writeFileSync(outputPath, JSON.stringify(payload, null, 2) + "\n");
+fs.writeFileSync(outputPath, JSON.stringify(payload, null, 2) + "\n", { flag: "wx" });
 NODE
 
 printf '%s\n' "$RUN_DIR"

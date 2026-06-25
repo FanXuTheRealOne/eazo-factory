@@ -52,8 +52,6 @@ Use `increment-review` value `1` only when starting a new independent review cyc
 
 ### 1. Preflight
 
-Confirm `$imagegen` is available in the current Codex skill/tool inventory. This capability cannot be inferred from a shell executable; stop before creating product artifacts when it is unavailable.
-
 Create resumable state before any check:
 
 ```bash
@@ -61,6 +59,8 @@ STAGING_DIR="$(bash <plugin-root>/scripts/init-run.sh <output-root> <provisional
 ```
 
 This creates `factory-run.json` with stage `preflight`. Preserve it on every failure.
+
+Confirm `$imagegen` is available in the current Codex skill/tool inventory. This capability cannot be inferred from a shell executable; record a failed preflight state and stop before creating product artifacts when it is unavailable.
 
 Run:
 
@@ -92,7 +92,7 @@ Explicitly invoke `$eazo-design` with:
   - `<staging>/design/design-tokens.json`;
   - `<staging>/design/interaction-map.json`.
 
-Retry `$imagegen` once with a simplified prompt when image generation fails. If the retry also fails, ask for explicit user approval before continuing with written design tokens and an interaction map only. Record the approved fallback in `factory-run.json`; otherwise stop.
+Retry `$imagegen` once with a simplified prompt when image generation fails. If the retry also fails, record a failed design state and stop. A runnable Eazo Factory release requires a valid UI reference image.
 
 ### 4. Scaffold
 
@@ -104,7 +104,13 @@ bash <plugin-root>/scripts/scaffold-app.sh <output-root> <slug>
 
 Copy `product-spec.json` and the complete `design/` directory from staging into the final app. Preserve the scaffolded `factory-run.json` and update its artifact records. Never copy staging Git metadata.
 
-Merge the staging run's original `started_at`, stage history, and artifact records into the scaffolded run state before deleting staging.
+Merge the staging run's original `started_at`, stage history, verification, review count, and artifact records into the scaffolded run state:
+
+```bash
+bash <plugin-root>/scripts/merge-run-state.sh <staging>/factory-run.json <app-directory>/factory-run.json
+```
+
+Do this before deleting staging.
 
 Append a clearly delimited `Generated App Contract` section to the official template's `AGENTS.md`. Preserve all official instructions. The appended section must point to the product/design artifacts, forbid controls outside `interaction-map.json`, and require `verify-app.sh` plus the independent review gate.
 
@@ -169,7 +175,7 @@ Start or confirm the final healthy preview only when:
 
 - deterministic verification passes;
 - review score is at least 85;
-- no blocking finding exists;
+- no blocking or important finding exists;
 - control coverage status is `pass`;
 - every discovered interactive control is mapped and passes;
 - core and bug category minimums pass.
@@ -194,4 +200,4 @@ Return:
 - number of discovered and passing controls;
 - unresolved non-blocking findings.
 
-Never report success when a blocking finding, failed audit entry, unmapped control, decorative button, or dead action remains.
+Never report success when a blocking or important finding, failed audit entry, unmapped control, decorative button, or dead action remains.
