@@ -23,3 +23,11 @@ Verification run:
 Notes / concerns:
 - The current workspace does not have a real `bun` binary installed, so the test provides a PATH-local stub to validate the local-override flow end to end without changing runtime dependencies.
 - `factory-run.json` records the canonical official starter URL and `main` branch to stay aligned with the Task 2 schema, even when a local override is used for deterministic testing.
+
+Reviewer follow-up:
+- Added destination symlink rejection before clone, with a regression test proving scaffolding fails and the external symlink target remains untouched.
+- Moved initial `factory-run.json` creation to the post-clone/post-fresh-git phase before demo cleanup, using an interim `cleanup_pending` stage.
+- Preserved cleanup failure evidence by streaming `cleanup:demo` output to both the command output and `review/cleanup-demo.log`, then updating `factory-run.json` to `status: failed` and `stage: cleanup_demo_failed`.
+
+Follow-up verification:
+- `bash plugins/eazo-factory/tests/test-scaffold.sh`
