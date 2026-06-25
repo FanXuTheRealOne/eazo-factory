@@ -1,0 +1,4 @@
+interface:
+  display_name: "Eazo Design"
+  short_description: "Generate functional UI art and design contracts."
+  default_prompt: "Use $eazo-design to create the UI reference, tokens, and interaction map."

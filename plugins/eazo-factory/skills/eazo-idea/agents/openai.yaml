@@ -1,0 +1,4 @@
+interface:
+  display_name: "Eazo Idea"
+  short_description: "Scope one small buildable Eazo app."
+  default_prompt: "Use $eazo-idea to turn this request into one small Eazo app specification."
