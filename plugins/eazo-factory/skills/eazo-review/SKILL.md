@@ -68,7 +68,7 @@ Return complete JSON payloads matching:
 - `review/review.json`
 - `review/control-audit.json`
 
-The orchestrator writes the payloads without changing their verdict. Include evidence for every blocking finding.
+The orchestrator writes the payloads without changing their verdict. Include evidence for every blocking or important finding.
 
 The app cannot pass unless:
 

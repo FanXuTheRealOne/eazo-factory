@@ -25,6 +25,7 @@ cp -R "$FIXTURES/valid-app" "$WORK_FIXTURES/transitive-ai-route-app"
 cp -R "$FIXTURES/valid-app" "$WORK_FIXTURES/fake-template-shell-app"
 cp -R "$FIXTURES/valid-app" "$WORK_FIXTURES/empty-map-app"
 cp -R "$FIXTURES/valid-app" "$WORK_FIXTURES/authenticated-ai-route-app"
+cp -R "$FIXTURES/valid-app" "$WORK_FIXTURES/barrel-ai-route-app"
 
 node - "$WORK_FIXTURES" <<'NODE'
 const fs = require("node:fs");
@@ -46,6 +47,7 @@ for (const app of [
   "fake-template-shell-app",
   "empty-map-app",
   "authenticated-ai-route-app",
+  "barrel-ai-route-app",
 ]) {
   fs.writeFileSync(path.join(root, app, "design/ui-reference.png"), png);
 }
@@ -68,7 +70,7 @@ fs.writeFileSync(
 );
 fs.writeFileSync(
   path.join(root, "extra-control-app", "src/app/page.tsx"),
-  '"use client";\nexport default function Page() { return <><button data-control-id="home-start-session" onClick={() => {}}>Begin</button><button onClick={() => alert("extra")}>Extra</button></>; }\n',
+  '"use client";\nconst DialogTrigger = ({ children }) => children;\nexport default function Page() { return <><button data-control-id="home-start-session" onClick={() => {}}>Begin</button><button onClick={() => alert("extra")}>Extra</button><DialogTrigger>Open</DialogTrigger></>; }\n',
 );
 const commentRouteDir = path.join(root, "comment-auth-app", "src/app/api/analyze");
 fs.mkdirSync(commentRouteDir, { recursive: true });
@@ -101,6 +103,18 @@ fs.mkdirSync(authenticatedRouteDir, { recursive: true });
 fs.writeFileSync(
   path.join(authenticatedRouteDir, "route.ts"),
   'import { ai, requireAuth } from "@eazo/sdk";\nexport async function POST(request: Request) { await requireAuth(request); return Response.json(await ai.chat({ messages: [] })); }\n',
+);
+const barrelRoot = path.join(root, "barrel-ai-route-app", "src");
+const barrelRouteDir = path.join(barrelRoot, "app/api/analyze");
+fs.mkdirSync(barrelRouteDir, { recursive: true });
+fs.mkdirSync(path.join(barrelRoot, "lib"), { recursive: true });
+fs.writeFileSync(
+  path.join(barrelRoot, "lib/eazo-ai.ts"),
+  'export { ai } from "@eazo/sdk";\n',
+);
+fs.writeFileSync(
+  path.join(barrelRouteDir, "route.ts"),
+  'import { ai } from "@/lib/eazo-ai";\nexport async function POST() { return Response.json(await ai.chat({ messages: [] })); }\n',
 );
 NODE
 
@@ -199,6 +213,13 @@ if run_verify "$WORK_FIXTURES/transitive-ai-route-app"; then
 fi
 grep -q '"code": "unguarded_ai_route"' \
   "$WORK_FIXTURES/transitive-ai-route-app/review/verification.json"
+
+if run_verify "$WORK_FIXTURES/barrel-ai-route-app"; then
+  echo "expected barrel AI route fixture to fail" >&2
+  exit 1
+fi
+grep -q '"code": "unguarded_ai_route"' \
+  "$WORK_FIXTURES/barrel-ai-route-app/review/verification.json"
 
 if run_verify "$WORK_FIXTURES/fake-template-shell-app"; then
   echo "expected fake template shell fixture to fail" >&2

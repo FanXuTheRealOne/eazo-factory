@@ -84,4 +84,4 @@ Each run passes only when:
 - core functionality is at least 25/30;
 - bugs/runtime correctness is at least 20/25;
 - every discovered control maps to the interaction inventory and passes;
-- no blocking finding remains.
+- no blocking or important finding remains.

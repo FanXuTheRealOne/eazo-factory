@@ -269,7 +269,7 @@ for (const envName of [".env", ".env.local", ".env.production", ".env.developmen
 }
 
 function directlyUsesAi(item) {
-  return /import\s*\{[^}]*\bai(?:\s+as\s+\w+)?\b[^}]*\}\s*from\s*["']@eazo\/sdk["']/.test(item.clean) ||
+  return /(?:import|export)\s*\{[^}]*\bai(?:\s+as\s+\w+)?\b[^}]*\}\s*from\s*["']@eazo\/sdk["']/.test(item.clean) ||
     /import\s+\*\s+as\s+(\w+)\s+from\s*["']@eazo\/sdk["'][\s\S]*?\b\1\.ai\b/.test(item.clean) ||
     /import\s*\(\s*["']@eazo\/sdk["']\s*\)[\s\S]*?\.ai\b/.test(item.clean);
 }
@@ -368,13 +368,14 @@ for (const item of sourceText.filter((candidate) => reachableFiles.has(candidate
     const lowerTag = tag.toLowerCase();
     const nativeInteractive =
       lowerTag === "button" ||
-      ["input", "select", "textarea"].includes(lowerTag) ||
+      ["input", "select", "textarea", "summary"].includes(lowerTag) ||
+      (["audio", "video"].includes(lowerTag) && /\bcontrols(?:\s|=|>)/.test(openingTag)) ||
       (lowerTag === "a" && /\bhref\s*=/.test(openingTag));
     const explicitInteractive =
-      /\b(onClick|onSubmit|formAction|href)\s*=/.test(openingTag) ||
+      /\b(onClick|onDoubleClick|onSubmit|onPointerDown|onPointerUp|onMouseDown|onMouseUp|onKeyDown|onKeyUp|onTouchStart|onTouchEnd|formAction|href)\s*=/.test(openingTag) ||
       /\btype\s*=\s*["']submit["']/.test(openingTag) ||
       /\brole\s*=\s*["']button["']/.test(openingTag);
-    const namedInteractive = /(?:Button|Link|Toggle|Switch|Tab|Select|Input|Textarea|Checkbox|Radio|MenuItem)$/.test(tag);
+    const namedInteractive = /(?:Button|Link|Toggle|Switch|Tab|Trigger|Select|Input|Textarea|Checkbox|Radio|Slider|Combobox|MenuItem)$/.test(tag);
     if (!nativeInteractive && !explicitInteractive && !namedInteractive) continue;
     const productId = openingTag.match(/\bdata-control-id\s*=\s*["']([^"']+)["']/)?.[1] ?? null;
     const sdkId = openingTag.match(/\bdata-eazo-sdk-control\s*=\s*["']([^"']+)["']/)?.[1] ?? null;
