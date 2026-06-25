@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "interaction_map_control_ids": ["home-start-session"],
+  "discovered_interactive_elements": [
+    {
+      "element_id": "home-start-session-button",
+      "screen_state": "home:idle",
+      "selector_or_description": "Begin button",
+      "owner": "product",
+      "mapped_control_id": "home-start-session",
+      "sdk_reference": null,
+      "status": "mapped"
+    }
+  ],
+  "entries": [
+    {
+      "control_id": "home-start-session",
+      "feature_id": "session",
+      "selector_or_description": "Begin button",
+      "mapped_requirement": "Session: the session can start",
+      "acceptance_reference": "product-spec.features[session].acceptance[0]",
+      "acceptance_text": "The session can start",
+      "action": "Click Begin",
+      "observed_result": "Session starts",
+      "status": "pass"
+    }
+  ],
+  "coverage": {
+    "interaction_map_control_count": 1,
+    "audited_control_count": 1,
+    "discovered_interactive_count": 1,
+    "mapped_discovered_interactive_count": 1,
+    "missing_control_ids": [],
+    "extra_control_ids": [],
+    "unmapped_discovered_interactive_elements": [],
+    "status": "pass"
+  }
+}

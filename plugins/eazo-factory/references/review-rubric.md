@@ -7,6 +7,8 @@ This review is a hard gate. A run passes only if all of the following are true:
 - core functionality at least 25/30;
 - bugs at least 20/25.
 
+Finding severities are exactly `blocking`, `important`, and `non_blocking`.
+
 ## review.json schema
 
 Use this exact shape:
@@ -53,7 +55,9 @@ Use this exact shape:
       "element_id": "home-idle-primary-button",
       "screen_state": "home:idle",
       "selector_or_description": "Primary button labeled Begin on home idle state",
+      "owner": "product",
       "mapped_control_id": "home-start-session",
+      "sdk_reference": null,
       "status": "mapped"
     }
   ],
@@ -92,7 +96,9 @@ Rules:
 - `status` should be `"pass"` or `"fail"`.
 - `entries` must include exactly one or more audit entries for every `interaction-map.json` control as needed across states.
 - Compare the set of `interaction_map_control_ids` to the set of `entries.control_id`; fail if any control id is missing or extra.
-- Every visible discovered interactive element must appear in `discovered_interactive_elements` and map back to exactly one `interaction-map.json` control id.
+- Every visible discovered interactive element must appear in `discovered_interactive_elements`.
+- Product-owned elements use `owner: "product"`, map to exactly one `interaction-map.json` control ID, and set `sdk_reference` to `null`.
+- Eazo SDK-owned elements use `owner: "eazo_sdk"`, set `mapped_control_id` to `null`, and provide a non-empty `sdk_reference` naming the official SDK-owned control.
 - Fail if `coverage.missing_control_ids`, `coverage.extra_control_ids`, or `coverage.unmapped_discovered_interactive_elements` are non-empty.
 - `coverage.status` is `"pass"` only when both compared control-id sets match exactly, all discovered interactive elements are mapped, and the four counts are internally consistent.
 

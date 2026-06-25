@@ -53,11 +53,13 @@ function walk(dir) {
 const requiredFiles = [
   "package.json",
   "AGENTS.md",
+  ".env.example",
   "product-spec.json",
   "factory-run.json",
   "design/ui-reference.png",
   "design/design-tokens.json",
   "design/interaction-map.json",
+  "src/app/layout.tsx",
   "src/i18n/locales/en-US.json",
   "src/i18n/locales/zh-CN.json",
 ];
@@ -80,11 +82,28 @@ if (pkg) {
   }
 }
 
+const imagePath = path.join(appDir, "design/ui-reference.png");
+if (fs.existsSync(imagePath)) {
+  const image = fs.readFileSync(imagePath);
+  const pngSignature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  if (image.length < 24 || !image.subarray(0, 8).equals(pngSignature)) {
+    add("invalid_ui_reference", "design/ui-reference.png must be a real PNG image", "design/ui-reference.png");
+  }
+}
+
 const run = fs.existsSync(path.join(appDir, "factory-run.json"))
   ? readJson("factory-run.json")
   : null;
 if (run && (!run.starter || typeof run.starter.commit !== "string" || !run.starter.commit.trim())) {
   add("missing_starter_commit", "factory-run.json starter.commit must be non-empty", "factory-run.json");
+}
+if (run?.starter?.source !== "https://github.com/EazoAI/eazo-creator-nextjs-template.git" ||
+    run?.starter?.branch !== "main") {
+  add(
+    "invalid_template_provenance",
+    "factory-run.json must record the canonical Eazo template main branch",
+    "factory-run.json",
+  );
 }
 
 if (fs.existsSync(path.join(appDir, "src/components/todo-list"))) {
@@ -103,15 +122,74 @@ const sourceText = sourceFiles
     return { file, relative: path.relative(appDir, file), text };
   });
 
+const layout = sourceText.find((item) => item.relative === "src/app/layout.tsx");
+if (layout) {
+  for (const requiredToken of [
+    "EazoProvider",
+    "I18nProvider",
+    "UserSyncEffect",
+    "NEXT_PUBLIC_APP_TITLE",
+    "NEXT_PUBLIC_APP_DESCRIPTION",
+  ]) {
+    if (!layout.text.includes(requiredToken)) {
+      add(
+        "missing_template_shell",
+        `src/app/layout.tsx must preserve ${requiredToken}`,
+        "src/app/layout.tsx",
+      );
+    }
+  }
+}
+
+const envExamplePath = path.join(appDir, ".env.example");
+if (!fs.existsSync(envExamplePath)) {
+  add("missing_env_documentation", "Missing .env.example", ".env.example");
+} else {
+  const envExample = fs.readFileSync(envExamplePath, "utf8");
+  for (const variable of [
+    "EAZO_PRIVATE_KEY",
+    "EAZO_APP_ID",
+    "NEXT_PUBLIC_APP_TITLE",
+    "NEXT_PUBLIC_APP_DESCRIPTION",
+  ]) {
+    if (!envExample.includes(variable)) {
+      add(
+        "missing_env_documentation",
+        `.env.example must document ${variable}`,
+        ".env.example",
+      );
+    }
+  }
+}
+
+for (const envName of [".env", ".env.local", ".env.production", ".env.development"]) {
+  const envPath = path.join(appDir, envName);
+  if (!fs.existsSync(envPath)) continue;
+  const envText = fs.readFileSync(envPath, "utf8");
+  if (/EAZO_PRIVATE_KEY\s*=\s*[0-9a-fA-F]{64}\b/.test(envText)) {
+    add("committed_secret", `${envName} contains an Eazo private key`, envName);
+  }
+}
+
 for (const item of sourceText) {
   const isClient = /(?:^|\n)\s*["']use client["'];?/.test(item.text);
   const importsAi =
     /import\s*\{[^}]*\bai\b[^}]*\}\s*from\s*["']@eazo\/sdk["']/.test(item.text) ||
-    /import\s+ai\s+from\s*["']@eazo\/sdk["']/.test(item.text);
+    /import\s+ai\s+from\s*["']@eazo\/sdk["']/.test(item.text) ||
+    /import\s+\*\s+as\s+\w+\s+from\s*["']@eazo\/sdk["'][\s\S]*?\.\s*ai\b/.test(item.text) ||
+    /import\s*\(\s*["']@eazo\/sdk["']\s*\)[\s\S]*?\.\s*ai\b/.test(item.text);
   if (isClient && importsAi) {
     add(
       "client_ai_import",
       "Client components must not import Eazo ai",
+      item.relative,
+    );
+  }
+
+  if (item.relative.startsWith("src/app/api/") && importsAi && !item.text.includes("requireAuth")) {
+    add(
+      "unguarded_ai_route",
+      "API routes using Eazo ai must call requireAuth",
       item.relative,
     );
   }
@@ -138,17 +216,49 @@ const interactionMap = fs.existsSync(path.join(appDir, "design/interaction-map.j
   ? readJson("design/interaction-map.json")
   : null;
 if (interactionMap && Array.isArray(interactionMap.controls)) {
-  const combinedSource = sourceText.map((item) => item.text).join("\n");
   for (const control of interactionMap.controls) {
     if (!control || typeof control.id !== "string" || !control.id.trim()) {
       add("invalid_control_id", "Every interaction-map control needs a non-empty id", "design/interaction-map.json");
       continue;
     }
-    if (!combinedSource.includes(control.id)) {
+    const escapedId = control.id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const attributePattern = new RegExp(
+      `data-control-id\\s*=\\s*["']${escapedId}["']`,
+    );
+    const candidates = [];
+    for (const item of sourceText) {
+      const openingTags = item.text.match(/<[A-Za-z][\w.]*\b[^>]*>/gs) ?? [];
+      for (const openingTag of openingTags) {
+        if (attributePattern.test(openingTag)) {
+          candidates.push({ item, openingTag });
+        }
+      }
+    }
+    if (candidates.length === 0) {
       add(
         "missing_control_implementation",
-        `Interaction control id is not referenced under src/: ${control.id}`,
+        `Interaction control id is not rendered as a literal data-control-id: ${control.id}`,
         "design/interaction-map.json",
+      );
+      continue;
+    }
+    const hasInteractiveCandidate = candidates.some(({ openingTag }) => {
+      const tagMatch = openingTag.match(/^<([A-Za-z][\w.]*)\b/);
+      const tag = tagMatch ? tagMatch[1] : "";
+      const lowerTag = tag.toLowerCase();
+      if (["input", "select", "textarea"].includes(lowerTag)) return true;
+      if (lowerTag === "a") return /\bhref\s*=/.test(openingTag) && !/href\s*=\s*["']#["']/.test(openingTag);
+      if (lowerTag === "button" || /^[A-Z]/.test(tag)) {
+        return /\b(onClick|onSubmit|formAction|href)\s*=/.test(openingTag) ||
+          /\btype\s*=\s*["']submit["']/.test(openingTag);
+      }
+      return /\b(role\s*=\s*["']button["'][^>]*\bonClick|onClick[^>]*role\s*=\s*["']button["'])/.test(openingTag);
+    });
+    if (!hasInteractiveCandidate) {
+      add(
+        "noninteractive_control_mapping",
+        `Control ${control.id} is attached only to non-interactive markup`,
+        candidates[0].item.relative,
       );
     }
   }

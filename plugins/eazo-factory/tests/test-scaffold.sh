@@ -156,6 +156,31 @@ assert_empty_dir() {
   test -z "$(ls -A "$dir_path")"
 }
 
+RUN_STATE_ROOT="$TMP_ROOT/run-state-output"
+mkdir -p "$RUN_STATE_ROOT"
+RUN_STATE_DIR="$(
+  bash "$PLUGIN_ROOT/scripts/init-run.sh" "$RUN_STATE_ROOT" "draft-app"
+)"
+RUN_STATE_ROOT="$(cd "$RUN_STATE_ROOT" && pwd -P)"
+test "$RUN_STATE_DIR" = "$RUN_STATE_ROOT/.eazo-factory-runs/draft-app"
+test -f "$RUN_STATE_DIR/factory-run.json"
+node - "$RUN_STATE_DIR/factory-run.json" <<'NODE'
+const fs = require("node:fs");
+const run = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+if (run.status !== "in_progress") throw new Error("wrong initial status");
+if (run.stage !== "preflight") throw new Error("wrong initial stage");
+if (run.starter.commit !== "") throw new Error("initial commit must be empty");
+NODE
+bash "$PLUGIN_ROOT/scripts/update-run.sh" \
+  "$RUN_STATE_DIR/factory-run.json" \
+  "idea" \
+  "in_progress"
+node - "$RUN_STATE_DIR/factory-run.json" <<'NODE'
+const fs = require("node:fs");
+const run = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+if (run.stage !== "idea") throw new Error("run state did not update");
+NODE
+
 HAPPY_STARTER="$TMP_ROOT/fake-starter-happy"
 HAPPY_OUTPUT_ROOT="$TMP_ROOT/output-happy"
 create_fake_starter "$HAPPY_STARTER" '"rm -rf demo-only.txt demo-dir"'

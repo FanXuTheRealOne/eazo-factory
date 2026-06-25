@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "verdict": "pass",
+  "core_functionality": 27,
+  "bugs": 22,
+  "visual_quality": 17,
+  "control_behavior": 13,
+  "control_necessity": 9,
+  "total_score": 88,
+  "findings": []
+}

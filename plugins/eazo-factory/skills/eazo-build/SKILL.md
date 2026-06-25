@@ -37,7 +37,7 @@ Then read only the official template examples for capabilities enabled in `produ
 
 1. Implement only features and states in `product-spec.json`.
 2. Implement every control in `design/interaction-map.json`.
-3. Put each control ID in the source as a stable `data-control-id`, constant, or equivalent implementation reference.
+3. Put each product control ID directly on its rendered interactive element as a literal `data-control-id="<control-id>"` attribute. Do not satisfy the verifier with comments, constants, wrappers, or non-interactive elements.
 4. Do not add buttons, links, tabs, toggles, menus, floating actions, or button-like decorations outside the interaction map, except controls rendered and owned by the Eazo SDK.
 5. When no action exists, use text or artwork that cannot be mistaken for a control.
 6. Preserve the official template architecture:

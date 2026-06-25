@@ -24,8 +24,8 @@ is_valid_slug "$SLUG" || die "invalid slug: $SLUG"
 mkdir -p "$OUTPUT_ROOT" || die "unable to create output root: $OUTPUT_ROOT"
 [ -d "$OUTPUT_ROOT" ] || die "output root is not a directory: $OUTPUT_ROOT"
 
-WRITE_PROBE="$OUTPUT_ROOT/.eazo-preflight-write-test.$$"
-: >"$WRITE_PROBE" || die "output root is not writable: $OUTPUT_ROOT"
+WRITE_PROBE="$(mktemp "$OUTPUT_ROOT/.eazo-preflight-write-test.XXXXXX")" \
+  || die "output root is not writable: $OUTPUT_ROOT"
 rm -f "$WRITE_PROBE"
 
 if [ -n "${EAZO_STARTER_PATH:-}" ]; then

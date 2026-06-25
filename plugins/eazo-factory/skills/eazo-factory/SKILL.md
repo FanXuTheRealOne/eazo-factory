@@ -40,9 +40,27 @@ preflight
 
 Update `factory-run.json` at every stage with status, stage, timestamps, artifact records, verification records, review cycle count, and preview URL.
 
+After each transition, call:
+
+```bash
+bash <plugin-root>/scripts/update-run.sh <run-path> <stage> <status> [preview-url] [increment-review]
+```
+
+Use `increment-review` value `1` only when starting a new independent review cycle. Add artifact and verification records to the same JSON without removing existing fields.
+
 ## Workflow
 
 ### 1. Preflight
+
+Confirm `$imagegen` is available in the current Codex skill/tool inventory. This capability cannot be inferred from a shell executable; stop before creating product artifacts when it is unavailable.
+
+Create resumable state before any check:
+
+```bash
+STAGING_DIR="$(bash <plugin-root>/scripts/init-run.sh <output-root> <provisional-slug>)"
+```
+
+This creates `factory-run.json` with stage `preflight`. Preserve it on every failure.
 
 Run:
 
@@ -50,17 +68,17 @@ Run:
 bash <plugin-root>/scripts/preflight.sh <output-root> <provisional-slug>
 ```
 
-Verify Codex, Git, Bun, Node, a writable output root, `$imagegen`, and access to the official Eazo template. Stop on failure.
+Verify Codex, Git, Bun, Node, a writable output root, and access to the official Eazo template. Stop on failure.
 
 ### 2. Idea
 
-Create the staging directory. Explicitly invoke `$eazo-idea` with:
+Use the staging directory returned by `init-run.sh`. Explicitly invoke `$eazo-idea` with:
 
 - the user's request;
 - staging directory as target;
 - expected output: `<staging>/product-spec.json`.
 
-Read the generated slug from the artifact. Rename the staging directory when the provisional slug differs.
+Read the generated slug from the artifact. Rename the staging directory when the provisional slug differs, preserving `factory-run.json`, and update its stage to `idea`.
 
 ### 3. Design
 
@@ -74,7 +92,7 @@ Explicitly invoke `$eazo-design` with:
   - `<staging>/design/design-tokens.json`;
   - `<staging>/design/interaction-map.json`.
 
-Retry `$imagegen` once with a simplified prompt when image generation fails. Stop if the retry fails; do not silently continue without a UI reference.
+Retry `$imagegen` once with a simplified prompt when image generation fails. If the retry also fails, ask for explicit user approval before continuing with written design tokens and an interaction map only. Record the approved fallback in `factory-run.json`; otherwise stop.
 
 ### 4. Scaffold
 
@@ -85,6 +103,10 @@ bash <plugin-root>/scripts/scaffold-app.sh <output-root> <slug>
 ```
 
 Copy `product-spec.json` and the complete `design/` directory from staging into the final app. Preserve the scaffolded `factory-run.json` and update its artifact records. Never copy staging Git metadata.
+
+Merge the staging run's original `started_at`, stage history, and artifact records into the scaffolded run state before deleting staging.
+
+Append a clearly delimited `Generated App Contract` section to the official template's `AGENTS.md`. Preserve all official instructions. The appended section must point to the product/design artifacts, forbid controls outside `interaction-map.json`, and require `verify-app.sh` plus the independent review gate.
 
 ### 5. Build
 
@@ -125,6 +147,7 @@ The Builder cannot approve its own work.
 4. Explicitly invoke `$eazo-review`.
 5. Require complete `review.json` and `control-audit.json` payloads.
 6. Write those payloads into `<app-directory>/review/` without changing the verdict.
+7. Run `bash <plugin-root>/scripts/validate-review.sh <app-directory>` and reject malformed, incomplete, or internally inconsistent review payloads.
 
 If no independent reviewer context can be created, stop. Self-review is not an acceptable fallback.
 
@@ -150,6 +173,12 @@ Start or confirm the final healthy preview only when:
 - control coverage status is `pass`;
 - every discovered interactive control is mapped and passes;
 - core and bug category minimums pass.
+
+Enforce these gates mechanically:
+
+```bash
+bash <plugin-root>/scripts/validate-review.sh <app-directory> --require-pass
+```
 
 Remove staging only after all artifacts are present in the final app. Preserve it on any interrupted or failed run.
 

@@ -45,7 +45,8 @@ Read:
 8. Record its screen/state, label or selector, mapped control ID, action, and observed result.
 9. Compare both directions:
    - every interaction-map control must have passing audit evidence;
-   - every discovered interactive element must map to exactly one interaction-map control or a documented Eazo SDK-owned control.
+   - every product-owned discovered interactive element must map to exactly one interaction-map control;
+   - every Eazo SDK-owned discovered control must be recorded with `owner: "eazo_sdk"`, `mapped_control_id: null`, and a non-empty official SDK reference.
 10. Fail any dead, decorative, redundant, placeholder, unnecessary, disabled-without-explanation, or unmapped control.
 11. Compare the rendered result with the generated UI reference and design tokens. Review:
    - composition and hierarchy;

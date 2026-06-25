@@ -70,7 +70,7 @@ const request = http.get(
   { host: "127.0.0.1", port, path: "/", timeout: 1000 },
   (response) => {
     response.resume();
-    process.exit(response.statusCode >= 200 && response.statusCode < 500 ? 0 : 1);
+    process.exit(response.statusCode >= 200 && response.statusCode < 400 ? 0 : 1);
   },
 );
 request.on("timeout", () => request.destroy(new Error("timeout")));

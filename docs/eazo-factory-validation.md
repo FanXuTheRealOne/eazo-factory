@@ -54,6 +54,16 @@ Run each prompt in a new writable test workspace:
 @eazo-factory Create a playful Bauhaus kitchen timer utility.
 ```
 
+## Official-template smoke result
+
+On June 25, 2026, `scaffold-app.sh` successfully cloned and cleaned official template commit:
+
+```text
+0067f106872c7f5372916e4fdbd7455eee006a38
+```
+
+The cleaned template completed `bun run build`. Its unchanged language switcher produced one upstream ESLint error under the downloaded dependency versions, so generated apps must repair that lint issue before the factory verifier can pass. This smoke result validates template access, cleanup, Git detachment, dependency installation, and production build; it is not a substitute for the three full app acceptance runs below.
+
 ## Evidence record
 
 Complete one row per generated app.
