@@ -1,0 +1,12 @@
+{
+  "name": "valid-app",
+  "private": true,
+  "packageManager": "bun@1.3.9",
+  "scripts": {
+    "lint": "true",
+    "build": "true"
+  },
+  "dependencies": {
+    "@eazo/sdk": "0.22.0"
+  }
+}

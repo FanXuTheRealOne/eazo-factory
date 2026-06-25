@@ -1,0 +1,8 @@
+{
+  "schema_version": "1.0",
+  "starter": {
+    "source": "https://github.com/EazoAI/eazo-creator-nextjs-template.git",
+    "branch": "main",
+    "commit": "abc123"
+  }
+}

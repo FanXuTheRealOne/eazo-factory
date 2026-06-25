@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "controls": [
+    {
+      "id": "home-start-session",
+      "screen": "home",
+      "feature_id": "session",
+      "destination": "home:active"
+    }
+  ]
+}
