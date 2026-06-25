@@ -1,0 +1,4 @@
+interface:
+  display_name: "Eazo Factory"
+  short_description: "Create and independently review one Eazo app."
+  default_prompt: "Use $eazo-factory to create one polished Eazo app from this request."
