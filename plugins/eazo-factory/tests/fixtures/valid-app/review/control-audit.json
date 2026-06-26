@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "interaction_map_control_ids": ["home-start-session"],
+  "interaction_map_control_ids": ["home-start-session", "global-language-toggle"],
   "discovered_interactive_elements": [
     {
       "element_id": "home-start-session-button",
@@ -8,6 +8,15 @@
       "selector_or_description": "Begin button",
       "owner": "product",
       "mapped_control_id": "home-start-session",
+      "sdk_reference": null,
+      "status": "mapped"
+    },
+    {
+      "element_id": "global-language-toggle-button",
+      "screen_state": "home:idle",
+      "selector_or_description": "Language toggle button",
+      "owner": "product",
+      "mapped_control_id": "global-language-toggle",
       "sdk_reference": null,
       "status": "mapped"
     }
@@ -23,13 +32,24 @@
       "action": "Click Begin",
       "observed_result": "Session starts",
       "status": "pass"
+    },
+    {
+      "control_id": "global-language-toggle",
+      "feature_id": "language-switching",
+      "selector_or_description": "Language toggle button",
+      "mapped_requirement": "Language switching: switch all product copy between English and Chinese",
+      "acceptance_reference": "product-spec.features[language-switching].acceptance[0]",
+      "acceptance_text": "A user can switch all product copy between English and Chinese without leaving the app",
+      "action": "Click 中文, then click EN",
+      "observed_result": "Visible copy switches between English and Chinese without navigation",
+      "status": "pass"
     }
   ],
   "coverage": {
-    "interaction_map_control_count": 1,
-    "audited_control_count": 1,
-    "discovered_interactive_count": 1,
-    "mapped_discovered_interactive_count": 1,
+    "interaction_map_control_count": 2,
+    "audited_control_count": 2,
+    "discovered_interactive_count": 2,
+    "mapped_discovered_interactive_count": 2,
     "missing_control_ids": [],
     "extra_control_ids": [],
     "unmapped_discovered_interactive_elements": [],

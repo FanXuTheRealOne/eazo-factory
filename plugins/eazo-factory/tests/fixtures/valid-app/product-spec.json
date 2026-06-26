@@ -1,9 +1,22 @@
 {
   "schema_version": "1.0",
+  "name": "Valid Timer",
+  "slug": "valid-timer",
+  "app_kind": "functional",
+  "summary": "A tiny bilingual timer utility.",
+  "target_user": "People testing the Eazo verifier.",
+  "core_problem": "The workflow needs one compact valid fixture.",
+  "primary_loop": ["Read ready state", "Start session", "Switch language if needed"],
   "features": [
     {
       "id": "session",
+      "name": "Session",
       "acceptance": ["The session can start"]
+    },
+    {
+      "id": "language-switching",
+      "name": "English / Chinese switch",
+      "acceptance": ["A user can switch all product copy between English and Chinese without leaving the app"]
     }
   ],
   "screens": [
@@ -11,5 +24,24 @@
       "id": "home",
       "states": ["idle", "active"]
     }
-  ]
+  ],
+  "capabilities": {
+    "auth": false,
+    "database": false,
+    "ai": false,
+    "memory": false,
+    "notifications": false,
+    "mcp": false
+  },
+  "locales": ["en-US", "zh-CN"],
+  "copy_direction": {
+    "en-US": "Short and direct",
+    "zh-CN": "简洁直接"
+  },
+  "audio": {
+    "bgm_required": false,
+    "mood": "No BGM for this functional test utility",
+    "user_control": "None"
+  },
+  "exclusions": ["BGM", "Decorative buttons", "Extra navigation"]
 }

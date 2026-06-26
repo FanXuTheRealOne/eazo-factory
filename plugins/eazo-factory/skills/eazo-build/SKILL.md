@@ -19,6 +19,7 @@ Confirm these files exist before editing source:
 - `design/ui-reference.png`
 - `design/design-tokens.json`
 - `design/interaction-map.json`
+- `design/asset-library.json`
 
 Read `../../references/eazo-template-policy.md` and follow its authority order.
 
@@ -49,11 +50,18 @@ Then read only the official template examples for capabilities enabled in `produ
    - call it only from API routes;
    - protect the route with `requireAuth`;
    - have client components call the route over HTTP.
-8. Provide all product copy in both `en-US` and `zh-CN`.
-9. Use `100dvh` and safe-area insets for full-height mobile layouts.
-10. Report meaningful mutations through `memory.reportAction(...).catch(() => {})` only when memory is enabled.
-11. Add database, notifications, AI, storage, or MCP code only when its capability is enabled.
-12. Implement visible loading, empty, error, active, and completion states required by the product flow.
+8. Provide all product copy in both `en-US` and `zh-CN`, and render a real mapped language switch control that toggles the active locale without leaving the app.
+9. Match the UI reference board and `design/asset-library.json`, not just the layout: use the supplied component shapes, background material, decorative parts, texture, icons, state elements, and spacing tokens.
+10. Implement motion from `design/design-tokens.json`:
+    - tap feedback on mapped controls;
+    - state transitions;
+    - one product-specific animated motif;
+    - respect `prefers-reduced-motion`.
+11. When `product-spec.json.audio.bgm_required` is `true`, implement matching BGM that starts only after a mapped user action. Prefer a lightweight procedural Web Audio loop over external assets unless the project already includes approved audio files.
+12. Use `100dvh` and safe-area insets for full-height mobile layouts.
+13. Report meaningful mutations through `memory.reportAction(...).catch(() => {})` only when memory is enabled.
+14. Add database, notifications, AI, storage, or MCP code only when its capability is enabled.
+15. Implement visible loading, empty, error, active, and completion states required by the product flow.
 
 ## Verification
 

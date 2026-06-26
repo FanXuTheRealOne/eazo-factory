@@ -14,6 +14,7 @@ Read these files completely:
 - `<app-directory>/product-spec.json`
 - `../../references/design-system-schema.md`
 - `../../references/interaction-map-schema.md`
+- `../../references/asset-library-schema.md`
 - exactly one file under `../../references/art-directions/`
 
 Choose the art direction that best serves the product. Use a user-requested direction when it is one of the supported references.
@@ -21,33 +22,50 @@ Choose the art direction that best serves the product. Use a user-requested dire
 ## Workflow
 
 1. Enumerate every required control from the product features, screen states, and primary loop.
+   - Include one persistent language switch control for `language-switching`.
+   - Include one BGM toggle/control when `product-spec.json.audio.bgm_required` is `true`.
 2. Remove any control that is decorative, redundant, speculative, or unsupported by an acceptance condition.
 3. Write `<app-directory>/design/interaction-map.json` before generating an image.
    - Use stable control IDs.
    - Bind every control to a valid product feature, screen, state transition, and acceptance condition.
    - Do not leave unlabeled or future controls.
-4. Write `<app-directory>/design/image-prompt.md`. Include the product purpose, selected art direction, mobile viewport, state shown, interaction inventory, hierarchy, and this exact paragraph:
+4. Write `<app-directory>/design/image-prompt.md`. Ask for one single UI reference board, not just a screenshot:
+   - a polished 390 × 844 mobile frame showing the primary app state;
+   - a compact asset-library grid in the same image with the exact mapped button/toggle styles, decorative parts, background material, texture fragments, icon style, state elements, motion notes, and BGM mood;
+   - each asset specimen should feel generated from the same locked style, like a coherent mini asset library;
+   - no extra navigation or decorative controls outside the interaction inventory;
+   - clear distinction between shipped screen controls and non-interactive asset specimens.
+5. Include the product purpose, selected art direction, mobile viewport, state shown, interaction inventory, hierarchy, motion direction, BGM mood when required, and this exact paragraph:
 
    > Every visible button, tab, link, toggle, menu item, input affordance, or floating action must correspond to the supplied interaction inventory and have a real implemented purpose. Do not add decorative buttons, speculative navigation, fake controls, disabled placeholders, or “coming soon” actions. Use static artwork or text when no interaction exists.
 
-5. Explicitly invoke `$imagegen` with that prompt and save one polished mobile frame to `<app-directory>/design/ui-reference.png`.
-6. Inspect the generated image rather than trusting the prompt:
+   Also include this exact paragraph:
+
+   > The asset-library grid is a design reference, not additional product scope. Component specimens must be labeled with their mapped control IDs or neutral material names. Do not invent extra product actions just to fill the board.
+
+6. Explicitly invoke `$imagegen` with that prompt and save one polished mobile reference board to `<app-directory>/design/ui-reference.png`.
+7. Inspect the generated image rather than trusting the prompt:
    - inventory every visible button-like or actionable element;
    - compare it against `interaction-map.json`;
    - verify labels and destinations are understandable;
    - verify no visual decoration resembles an accidental control.
-7. If any visible control is missing, decorative, speculative, or unmapped, edit or regenerate the image once. Do not legitimize an accidental control by adding it to the map unless the product specification genuinely requires it.
-8. Write `<app-directory>/design/design-tokens.json` using the exact schema and selected art-direction slug.
-9. Parse both JSON files and confirm every visible control has a real mapped purpose.
+8. If any visible product control is missing, decorative, speculative, or unmapped, edit or regenerate the image once. Do not legitimize an accidental control by adding it to the map unless the product specification genuinely requires it.
+9. Write `<app-directory>/design/design-tokens.json` using the exact schema and selected art-direction slug. Include:
+   - `reference_board` details;
+   - a product-specific `motion.signature`;
+   - `audio` matching the product BGM requirement.
+10. Write `<app-directory>/design/asset-library.json` using the exact schema. It should inventory the reusable pieces from the reference board: mapped control specimens, decorative motifs, background layers, state elements, icons, textures, motion motifs, and BGM mood notes.
+11. Parse all JSON files and confirm every visible product control has a real mapped purpose.
 
 ## Output gate
 
-Do not hand off to implementation unless all five artifacts exist:
+Do not hand off to implementation unless all six artifacts exist:
 
 - `product-spec.json`
 - `design/ui-reference.png`
 - `design/image-prompt.md`
 - `design/design-tokens.json`
 - `design/interaction-map.json`
+- `design/asset-library.json`
 
 Return their absolute paths and the final number of mapped controls. Do not write application code.

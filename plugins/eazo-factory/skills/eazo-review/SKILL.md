@@ -53,8 +53,10 @@ Read:
    - spacing and alignment;
    - typography and contrast;
    - responsive behavior and safe areas;
-   - motion restraint and state transitions;
+   - motion quality, tap feedback, state transitions, and reduced-motion behavior;
    - localization fit;
+   - English / Chinese language switching;
+   - matching BGM behavior when required, including user-controlled start/stop and no autoplay surprise;
    - art-direction fidelity;
    - loading, empty, error, and completion polish.
 12. Score all five rubric categories and calculate the exact total.

@@ -1,20 +1,20 @@
 {
   "name": "eazo-factory",
   "version": "0.1.0",
-  "description": "Generate and review standardized Eazo apps with Codex.",
+  "description": "Generate bilingual, polished Eazo apps with Codex.",
   "author": {
     "name": "EazoAI"
   },
   "skills": "./skills/",
   "interface": {
     "displayName": "Eazo Factory",
-    "shortDescription": "Generate a polished, reviewed Eazo app from one prompt.",
-    "longDescription": "Eazo Factory turns one product prompt into a standardized Eazo app using the official Eazo Next.js template, $imagegen design, deterministic checks, and mandatory independent review.",
+    "shortDescription": "Generate a bilingual, reviewed Eazo app from one prompt.",
+    "longDescription": "Eazo Factory turns one product prompt into a standardized bilingual Eazo app using the official Eazo Next.js template, a $imagegen UI reference board with an asset library, deterministic checks, and mandatory independent review.",
     "developerName": "EazoAI",
     "category": "Developer Tools",
     "capabilities": [
       "Generate standardized Eazo apps from the official template",
-      "Create functional UI references with image generation",
+      "Create UI reference boards with reusable asset libraries",
       "Audit every interactive control with an independent reviewer"
     ],
     "defaultPrompt": [

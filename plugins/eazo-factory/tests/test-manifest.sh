@@ -22,12 +22,12 @@ if (!interfaceBlock || typeof interfaceBlock !== "object") {
   throw new Error("missing interface block");
 }
 if (interfaceBlock.displayName !== "Eazo Factory") throw new Error("wrong displayName");
-if (interfaceBlock.shortDescription !== "Generate a polished, reviewed Eazo app from one prompt.") {
+if (interfaceBlock.shortDescription !== "Generate a bilingual, reviewed Eazo app from one prompt.") {
   throw new Error("wrong shortDescription");
 }
 if (
   interfaceBlock.longDescription !==
-  "Eazo Factory turns one product prompt into a standardized Eazo app using the official Eazo Next.js template, $imagegen design, deterministic checks, and mandatory independent review."
+  "Eazo Factory turns one product prompt into a standardized bilingual Eazo app using the official Eazo Next.js template, a $imagegen UI reference board with an asset library, deterministic checks, and mandatory independent review."
 ) {
   throw new Error("wrong longDescription");
 }
@@ -38,7 +38,7 @@ if (interfaceBlock.capabilities.length !== 3) throw new Error("wrong capabilitie
 if (interfaceBlock.capabilities[0] !== "Generate standardized Eazo apps from the official template") {
   throw new Error("wrong first capability");
 }
-if (interfaceBlock.capabilities[1] !== "Create functional UI references with image generation") {
+if (interfaceBlock.capabilities[1] !== "Create UI reference boards with reusable asset libraries") {
   throw new Error("wrong second capability");
 }
 if (interfaceBlock.capabilities[2] !== "Audit every interactive control with an independent reviewer") {

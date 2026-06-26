@@ -26,6 +26,8 @@ cp -R "$FIXTURES/valid-app" "$WORK_FIXTURES/fake-template-shell-app"
 cp -R "$FIXTURES/valid-app" "$WORK_FIXTURES/empty-map-app"
 cp -R "$FIXTURES/valid-app" "$WORK_FIXTURES/authenticated-ai-route-app"
 cp -R "$FIXTURES/valid-app" "$WORK_FIXTURES/barrel-ai-route-app"
+cp -R "$FIXTURES/valid-app" "$WORK_FIXTURES/missing-language-control-app"
+cp -R "$FIXTURES/valid-app" "$WORK_FIXTURES/missing-bgm-feature-app"
 
 node - "$WORK_FIXTURES" <<'NODE'
 const fs = require("node:fs");
@@ -48,6 +50,8 @@ for (const app of [
   "empty-map-app",
   "authenticated-ai-route-app",
   "barrel-ai-route-app",
+  "missing-language-control-app",
+  "missing-bgm-feature-app",
 ]) {
   fs.writeFileSync(path.join(root, app, "design/ui-reference.png"), png);
 }
@@ -98,6 +102,15 @@ fs.writeFileSync(
   path.join(root, "empty-map-app", "design/interaction-map.json"),
   JSON.stringify({ schema_version: "1.0", controls: [] }, null, 2) + "\n",
 );
+const missingLanguageMapPath = path.join(root, "missing-language-control-app", "design/interaction-map.json");
+const missingLanguageMap = JSON.parse(fs.readFileSync(missingLanguageMapPath, "utf8"));
+missingLanguageMap.controls = missingLanguageMap.controls.filter((control) => control.id !== "global-language-toggle");
+fs.writeFileSync(missingLanguageMapPath, JSON.stringify(missingLanguageMap, null, 2) + "\n");
+const missingBgmSpecPath = path.join(root, "missing-bgm-feature-app", "product-spec.json");
+const missingBgmSpec = JSON.parse(fs.readFileSync(missingBgmSpecPath, "utf8"));
+missingBgmSpec.app_kind = "experiential";
+missingBgmSpec.audio.bgm_required = true;
+fs.writeFileSync(missingBgmSpecPath, JSON.stringify(missingBgmSpec, null, 2) + "\n");
 const authenticatedRouteDir = path.join(root, "authenticated-ai-route-app", "src/app/api/analyze");
 fs.mkdirSync(authenticatedRouteDir, { recursive: true });
 fs.writeFileSync(
@@ -234,6 +247,20 @@ if run_verify "$WORK_FIXTURES/empty-map-app"; then
 fi
 grep -q '"code": "empty_interaction_map"' \
   "$WORK_FIXTURES/empty-map-app/review/verification.json"
+
+if run_verify "$WORK_FIXTURES/missing-language-control-app"; then
+  echo "expected missing language control fixture to fail" >&2
+  exit 1
+fi
+grep -q '"code": "missing_language_control"' \
+  "$WORK_FIXTURES/missing-language-control-app/review/verification.json"
+
+if run_verify "$WORK_FIXTURES/missing-bgm-feature-app"; then
+  echo "expected missing BGM feature fixture to fail" >&2
+  exit 1
+fi
+grep -q '"code": "missing_bgm_feature"' \
+  "$WORK_FIXTURES/missing-bgm-feature-app/review/verification.json"
 
 bash "$PLUGIN_ROOT/scripts/validate-review.sh" "$WORK_FIXTURES/valid-app" --require-pass
 

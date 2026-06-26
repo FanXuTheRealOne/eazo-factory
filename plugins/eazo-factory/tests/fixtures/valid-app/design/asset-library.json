@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "style_lock": "Quiet editorial utility UI with soft cards, concise type, and restrained motion",
+  "assets": [
+    {
+      "id": "primary-button",
+      "type": "component",
+      "name": "Primary button",
+      "mapped_control_id": "home-start-session",
+      "implementation_hint": "Rounded dark button with 120ms press scale"
+    },
+    {
+      "id": "language-toggle",
+      "type": "component",
+      "name": "Language toggle",
+      "mapped_control_id": "global-language-toggle",
+      "implementation_hint": "Small ghost pill in the top right"
+    },
+    {
+      "id": "soft-card",
+      "type": "surface",
+      "name": "Soft card",
+      "mapped_control_id": null,
+      "implementation_hint": "Cream card with subtle border and transition shadow"
+    }
+  ]
+}

@@ -5,7 +5,7 @@ description: Create one complete Eazo app from an idea or product request, inclu
 
 # Eazo Factory
 
-Create one independent app per invocation. Do not batch, deploy, publish, or push a remote repository.
+Create one independent app per invocation. Do not batch, deploy, publish, or push a remote repository. Prefer compact artifacts and one decisive pass over verbose planning.
 
 ## Resolve paths
 
@@ -24,21 +24,10 @@ The staging directory prevents pre-scaffold product and design artifacts from ma
 Execute every stage in order:
 
 ```text
-preflight
-→ idea
-→ design
-→ scaffold
-→ build
-→ verify
-→ preview
-→ independent review
-→ fix
-→ re-verify
-→ re-review
-→ final preview
+preflight → idea → design → scaffold → build → verify → preview → independent review → optional one fix/re-review → final preview
 ```
 
-Update `factory-run.json` at every stage with status, stage, timestamps, artifact records, verification records, review cycle count, and preview URL.
+Update `factory-run.json` at the durable milestones only: preflight, idea, design, scaffold, build, verify, preview, review, fix, final.
 
 After each transition, call:
 
@@ -78,6 +67,8 @@ Use the staging directory returned by `init-run.sh`. Explicitly invoke `$eazo-id
 - staging directory as target;
 - expected output: `<staging>/product-spec.json`.
 
+The product spec must include `language-switching`. It must include `ambient-bgm` unless the app is explicitly utility-first/functional.
+
 Read the generated slug from the artifact. Rename the staging directory when the provisional slug differs, preserving `factory-run.json`, and update its stage to `idea`.
 
 ### 3. Design
@@ -90,7 +81,10 @@ Explicitly invoke `$eazo-design` with:
   - `<staging>/design/ui-reference.png`;
   - `<staging>/design/image-prompt.md`;
   - `<staging>/design/design-tokens.json`;
-  - `<staging>/design/interaction-map.json`.
+  - `<staging>/design/interaction-map.json`;
+  - `<staging>/design/asset-library.json`.
+
+Require the UI image to be a single reference board: one polished mobile frame plus a compact asset library grid of matched controls, decorative parts, background material, icons, state elements, motion notes, and BGM mood. Do not request multiple separate image variations.
 
 Retry `$imagegen` once with a simplified prompt when image generation fails. If the retry also fails, record a failed design state and stop. A runnable Eazo Factory release requires a valid UI reference image.
 
@@ -157,7 +151,7 @@ The Builder cannot approve its own work.
 
 If no independent reviewer context can be created, stop. Self-review is not an acceptable fallback.
 
-### 9. Fix and review loop
+### 9. Optional fix and re-review
 
 When the verdict fails:
 
@@ -167,7 +161,7 @@ When the verdict fails:
 4. restart preview if needed;
 5. launch a fresh independent reviewer context and invoke `$eazo-review` again.
 
-Allow at most two fix-and-review cycles. Never weaken product requirements, the interaction map, verifier, or rubric to obtain a pass.
+Allow at most one fix-and-review cycle. Never weaken product requirements, the interaction map, verifier, or rubric to obtain a pass. If the second verdict fails, return the app path, preview command, and bounded fix list instead of continuing to spend tokens.
 
 ### 10. Final preview
 

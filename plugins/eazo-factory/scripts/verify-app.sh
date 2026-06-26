@@ -115,6 +115,7 @@ const requiredFiles = [
   "design/ui-reference.png",
   "design/design-tokens.json",
   "design/interaction-map.json",
+  "design/asset-library.json",
   "src/app/layout.tsx",
   "src/i18n/locales/en-US.json",
   "src/i18n/locales/zh-CN.json",
@@ -128,6 +129,15 @@ for (const relativePath of requiredFiles) {
 
 const pkg = fs.existsSync(path.join(appDir, "package.json"))
   ? readJson("package.json")
+  : null;
+const productSpec = fs.existsSync(path.join(appDir, "product-spec.json"))
+  ? readJson("product-spec.json")
+  : null;
+const designTokens = fs.existsSync(path.join(appDir, "design/design-tokens.json"))
+  ? readJson("design/design-tokens.json")
+  : null;
+const assetLibrary = fs.existsSync(path.join(appDir, "design/asset-library.json"))
+  ? readJson("design/asset-library.json")
   : null;
 if (pkg) {
   if (typeof pkg.packageManager !== "string" || !pkg.packageManager.startsWith("bun@")) {
@@ -177,6 +187,51 @@ const sourceText = sourceFiles
     return { file, relative: path.relative(appDir, file), text, clean: stripComments(text) };
   });
 const sourceByFile = new Map(sourceText.map((item) => [item.file, item]));
+
+const featureIds = Array.isArray(productSpec?.features)
+  ? productSpec.features.map((feature) => feature?.id).filter((id) => typeof id === "string")
+  : [];
+const locales = Array.isArray(productSpec?.locales) ? productSpec.locales : [];
+const hasRequiredLocales = locales.includes("en-US") && locales.includes("zh-CN");
+if (productSpec) {
+  if (!hasRequiredLocales) {
+    add("missing_bilingual_locales", "product-spec.json must include en-US and zh-CN locales", "product-spec.json");
+  }
+  if (!featureIds.includes("language-switching")) {
+    add("missing_language_feature", "Every Eazo app must include a language-switching feature", "product-spec.json");
+  }
+  if (!["functional", "experiential"].includes(productSpec.app_kind)) {
+    add("invalid_app_kind", "product-spec.json app_kind must be functional or experiential", "product-spec.json");
+  }
+}
+const bgmRequired = productSpec &&
+  (productSpec.app_kind === "experiential" || productSpec.audio?.bgm_required === true);
+if (bgmRequired) {
+  if (productSpec.audio?.bgm_required !== true) {
+    add("missing_bgm_requirement", "Experiential apps must set audio.bgm_required to true", "product-spec.json");
+  }
+  if (!featureIds.includes("ambient-bgm")) {
+    add("missing_bgm_feature", "Apps with required BGM must include an ambient-bgm feature", "product-spec.json");
+  }
+}
+if (designTokens) {
+  if (typeof designTokens.motion?.signature !== "string" || !designTokens.motion.signature.trim()) {
+    add("missing_motion_signature", "design/design-tokens.json must include motion.signature", "design/design-tokens.json");
+  }
+  if (bgmRequired && designTokens.audio?.bgm !== true) {
+    add("missing_bgm_tokens", "design/design-tokens.json must declare audio.bgm true when BGM is required", "design/design-tokens.json");
+  }
+}
+if (assetLibrary) {
+  if (assetLibrary.schema_version !== "1.0" || !Array.isArray(assetLibrary.assets)) {
+    add("invalid_asset_library", "design/asset-library.json must use schema_version 1.0 and an assets array", "design/asset-library.json");
+  } else if (assetLibrary.assets.length < 3) {
+    add("thin_asset_library", "design/asset-library.json must list at least three reusable visual assets", "design/asset-library.json");
+  }
+  if (typeof assetLibrary.style_lock !== "string" || !assetLibrary.style_lock.trim()) {
+    add("missing_style_lock", "design/asset-library.json must include a non-empty style_lock", "design/asset-library.json");
+  }
+}
 
 function resolveImport(fromFile, specifier) {
   let base;
@@ -403,6 +458,28 @@ if (!interactionMap || interactionMap.schema_version !== "1.0" || !Array.isArray
   const mapIds = interactionMap.controls
     .map((control) => control?.id)
     .filter((id) => typeof id === "string" && id.trim());
+  const languageControls = interactionMap.controls.filter(
+    (control) => control?.feature_id === "language-switching",
+  );
+  if (languageControls.length !== 1) {
+    add(
+      "missing_language_control",
+      "interaction-map.json must define exactly one control for feature_id language-switching",
+      "design/interaction-map.json",
+    );
+  }
+  if (bgmRequired) {
+    const bgmControls = interactionMap.controls.filter(
+      (control) => control?.feature_id === "ambient-bgm",
+    );
+    if (bgmControls.length !== 1) {
+      add(
+        "missing_bgm_control",
+        "Apps with required BGM must define exactly one control for feature_id ambient-bgm",
+        "design/interaction-map.json",
+      );
+    }
+  }
   const sourceProductIds = unique(
     sourceControlInventory.filter((control) => control.owner === "product").map((control) => control.id),
   );
@@ -460,6 +537,39 @@ if (!interactionMap || interactionMap.schema_version !== "1.0" || !Array.isArray
         candidates[0].item.relative,
       );
     }
+  }
+  if (assetLibrary?.schema_version === "1.0" && Array.isArray(assetLibrary.assets)) {
+    const mappedAssetControlIds = assetLibrary.assets
+      .map((asset) => asset?.mapped_control_id)
+      .filter((id) => typeof id === "string" && id.trim());
+    for (const mappedId of mappedAssetControlIds) {
+      if (!mapIds.includes(mappedId)) {
+        add(
+          "invalid_asset_control_mapping",
+          `asset-library.json references unknown mapped_control_id: ${mappedId}`,
+          "design/asset-library.json",
+        );
+      }
+    }
+  }
+}
+
+if (sourceText.length > 0) {
+  const reachableSource = sourceText
+    .filter((candidate) => reachableFiles.has(candidate.file))
+    .map((item) => item.clean)
+    .join("\n");
+  if (bgmRequired && !/(AudioContext|webkitAudioContext|new\s+Audio\s*\(|<audio\b)/i.test(reachableSource)) {
+    add(
+      "missing_bgm_implementation",
+      "Apps with required BGM must implement user-controlled audio playback",
+    );
+  }
+  if (!/(\btransition(?:-|:)|\banimate-|@keyframes|prefers-reduced-motion|requestAnimationFrame)/i.test(reachableSource)) {
+    add(
+      "missing_motion_implementation",
+      "App source must include visible motion or transitions and account for reduced motion where appropriate",
+    );
   }
 }
 

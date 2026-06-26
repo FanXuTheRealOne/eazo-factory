@@ -106,6 +106,6 @@ Rules:
 
 - Core functionality (30): primary loop completeness, feature acceptance coverage, and state continuity.
 - Bugs/runtime correctness (25): broken states, console/runtime issues, dead ends, localization mismatches, and data loss.
-- Visual quality (20): composition, hierarchy, polish, consistency, and alignment with the chosen art direction.
+- Visual quality (20): composition, hierarchy, polish, consistency, motion, BGM fit when required, and alignment with the chosen art direction/reference board.
 - Control behavior (15): each control behaves as labeled and lands in the expected destination or state.
 - Control necessity (10): every visible control is justified by the product spec; remove decorative or redundant controls.

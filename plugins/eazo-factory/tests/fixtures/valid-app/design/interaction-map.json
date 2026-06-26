@@ -4,8 +4,38 @@
     {
       "id": "home-start-session",
       "screen": "home",
+      "control_type": "button",
+      "label": {
+        "en-US": "Begin",
+        "zh-CN": "开始"
+      },
       "feature_id": "session",
-      "destination": "home:active"
+      "action": "Start the session",
+      "destination": "home:active",
+      "destination_reference": {
+        "type": "product_screen_state",
+        "screen_id": "home",
+        "state": "active"
+      },
+      "acceptance": "The session can start"
+    },
+    {
+      "id": "global-language-toggle",
+      "screen": "home",
+      "control_type": "toggle",
+      "label": {
+        "en-US": "中文",
+        "zh-CN": "EN"
+      },
+      "feature_id": "language-switching",
+      "action": "Switch product copy between English and Chinese",
+      "destination": "home:idle",
+      "destination_reference": {
+        "type": "product_screen_state",
+        "screen_id": "home",
+        "state": "idle"
+      },
+      "acceptance": "A user can switch all product copy between English and Chinese without leaving the app"
     }
   ]
 }
