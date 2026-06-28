@@ -1,0 +1,4 @@
+interface:
+  display_name: "Eazo Source"
+  short_description: "Extract an Eazo app brief from links and screenshots."
+  default_prompt: "Use $eazo-source to convert this link or screenshot set into source/source-brief.json."

@@ -28,6 +28,16 @@ codex plugin add eazo-factory@eazo-tools
 @eazo-factory Create a Matisse-inspired breathing meditation app.
 ```
 
+You can also provide source material directly:
+
+```text
+@eazo-factory 从这个小红书链接复刻成一个 Eazo app: https://www.xiaohongshu.com/...
+```
+
+```text
+@eazo-factory 按这几张小红书截图做成一个 Eazo app
+```
+
 For first-time help, invoke the plugin without an app brief:
 
 ```text
@@ -36,7 +46,7 @@ For first-time help, invoke the plugin without an app brief:
 
 The plugin will show a short onboarding guide and example prompts instead of starting generation.
 
-The workflow produces a product specification, `$imagegen` UI reference board, reusable asset library, interaction map, official-template implementation, deterministic verification, independent browser review, control audit, and local preview.
+The workflow can extract a source brief from links or screenshots, then produces a product specification, `$imagegen` UI reference board, reusable asset library, interaction map, official-template implementation, deterministic verification, independent browser review, control audit, and local preview.
 
 ## Requirements
 

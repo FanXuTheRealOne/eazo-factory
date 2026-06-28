@@ -12,6 +12,7 @@ Turn the approved product contract into a functional visual contract before appl
 Read these files completely:
 
 - `<app-directory>/product-spec.json`
+- `<app-directory>/source/source-brief.json` when present
 - `../../references/design-system-schema.md`
 - `../../references/interaction-map-schema.md`
 - `../../references/asset-library-schema.md`
@@ -33,15 +34,20 @@ Choose the art direction that best serves the product. Use a user-requested dire
    - a polished 390 × 844 mobile frame showing the primary app state;
    - a compact asset-library grid in the same image with the exact mapped button/toggle styles, decorative parts, background material, texture fragments, icon style, state elements, motion notes, and BGM mood;
    - each asset specimen should feel generated from the same locked style, like a coherent mini asset library;
+   - source-derived UI layout, component shapes, visual motifs, content hierarchy, and copy tone when `source/source-brief.json` exists;
    - no extra navigation or decorative controls outside the interaction inventory;
    - clear distinction between shipped screen controls and non-interactive asset specimens.
-5. Include the product purpose, selected art direction, mobile viewport, state shown, interaction inventory, hierarchy, motion direction, BGM mood when required, and this exact paragraph:
+5. Include the product purpose, selected art direction, mobile viewport, state shown, interaction inventory, hierarchy, motion direction, BGM mood when required, source UI observations when present, and this exact paragraph:
 
    > Every visible button, tab, link, toggle, menu item, input affordance, or floating action must correspond to the supplied interaction inventory and have a real implemented purpose. Do not add decorative buttons, speculative navigation, fake controls, disabled placeholders, or “coming soon” actions. Use static artwork or text when no interaction exists.
 
    Also include this exact paragraph:
 
    > The asset-library grid is a design reference, not additional product scope. Component specimens must be labeled with their mapped control IDs or neutral material names. Do not invent extra product actions just to fill the board.
+
+   When source material exists, also include this exact paragraph:
+
+   > Use the source material as product and visual inspiration: preserve its app idea, hierarchy, important UI elements, mood, and reusable visual parts. Create an original Eazo interface; do not copy watermarks, creator names, private profile data, or long captions verbatim.
 
 6. Explicitly invoke `$imagegen` with that prompt and save one polished mobile reference board to `<app-directory>/design/ui-reference.png`.
 7. Inspect the generated image rather than trusting the prompt:

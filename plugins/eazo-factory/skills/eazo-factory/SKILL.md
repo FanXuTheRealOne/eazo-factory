@@ -37,6 +37,30 @@ Onboarding response shape:
 
 Keep onboarding under 220 Chinese characters or 160 English words unless the user asks for details.
 
+## Source-material mode
+
+When the user invokes Eazo Factory with a URL, screenshot, image set, pasted social post, or phrasing like "from this", "复刻这个", "照这个做", "从这个链接", treat the source material as the app brief. Do not ask for a separate written product prompt when the source is usable.
+
+Supported source examples:
+
+- Xiaohongshu URLs: `xiaohongshu.com`, `xhslink.com`, `xhs.cn`, or 小红书 links;
+- one or more screenshots of a post, UI, carousel, notes, or visual reference;
+- mixed input: a link plus screenshots or short extra instructions.
+
+For source-material mode, insert a source intake stage before idea:
+
+```text
+source intake → idea → design
+```
+
+Source intake rules:
+
+1. Explicitly invoke `$eazo-source` with the user's source material and staging directory.
+2. Expected output: `<staging>/source/source-brief.json`.
+3. If `$eazo-source` reports that a link is inaccessible and no screenshot/text contains enough information, stop and ask for screenshots in one concise sentence.
+4. Pass `source/source-brief.json` into `$eazo-idea` and `$eazo-design`.
+5. Preserve the source's product intent, UI structure, visual motifs, content hierarchy, copy tone, and key elements. Create original Eazo UI; do not copy watermarks, creator identity, private data, or long verbatim captions.
+
 ## Resolve paths
 
 Determine:
@@ -54,7 +78,7 @@ The staging directory prevents pre-scaffold product and design artifacts from ma
 Execute every stage in order:
 
 ```text
-preflight → idea → design → scaffold → build → verify → preview → independent review → optional one fix/re-review → final preview
+preflight → optional source intake → idea → design → scaffold → build → verify → preview → independent review → optional one fix/re-review → final preview
 ```
 
 Update `factory-run.json` at the durable milestones only: preflight, idea, design, scaffold, build, verify, preview, review, fix, final.
@@ -89,11 +113,24 @@ bash <plugin-root>/scripts/preflight.sh <output-root> <provisional-slug>
 
 Verify Codex, Git, Bun, Node, a writable output root, and access to the official Eazo template. Stop on failure.
 
-### 2. Idea
+### 2. Optional source intake
+
+Run this stage only in source-material mode.
+
+Explicitly invoke `$eazo-source` with:
+
+- the user's URLs, screenshots, images, pasted post text, and any extra instruction;
+- staging directory as target;
+- expected output: `<staging>/source/source-brief.json`.
+
+If source extraction succeeds with medium or high confidence, continue without asking for more user text. If extraction confidence is low but still contains a usable product intent, continue and let `$eazo-idea` simplify it. If the source is inaccessible and not enough screenshot/text evidence exists, record a failed source state and stop with one sentence asking for screenshots.
+
+### 3. Idea
 
 Use the staging directory returned by `init-run.sh`. Explicitly invoke `$eazo-idea` with:
 
 - the user's request;
+- `<staging>/source/source-brief.json` when source-material mode ran;
 - staging directory as target;
 - expected output: `<staging>/product-spec.json`.
 
@@ -101,11 +138,12 @@ The product spec must include `language-switching`. It must include `ambient-bgm
 
 Read the generated slug from the artifact. Rename the staging directory when the provisional slug differs, preserving `factory-run.json`, and update its stage to `idea`.
 
-### 3. Design
+### 4. Design
 
 Explicitly invoke `$eazo-design` with:
 
 - `<staging>/product-spec.json`;
+- `<staging>/source/source-brief.json` when present;
 - staging directory as target;
 - expected outputs:
   - `<staging>/design/ui-reference.png`;
@@ -118,7 +156,7 @@ Require the UI image to be a single reference board: one polished mobile frame p
 
 Retry `$imagegen` once with a simplified prompt when image generation fails. If the retry also fails, record a failed design state and stop. A runnable Eazo Factory release requires a valid UI reference image.
 
-### 4. Scaffold
+### 5. Scaffold
 
 Run:
 
@@ -126,7 +164,7 @@ Run:
 bash <plugin-root>/scripts/scaffold-app.sh <output-root> <slug>
 ```
 
-Copy `product-spec.json` and the complete `design/` directory from staging into the final app. Preserve the scaffolded `factory-run.json` and update its artifact records. Never copy staging Git metadata.
+Copy `product-spec.json`, optional `source/`, and the complete `design/` directory from staging into the final app. Preserve the scaffolded `factory-run.json` and update its artifact records. Never copy staging Git metadata.
 
 Merge the staging run's original `started_at`, stage history, verification, review count, and artifact records into the scaffolded run state:
 
@@ -138,7 +176,7 @@ Do this before deleting staging.
 
 Append a clearly delimited `Generated App Contract` section to the official template's `AGENTS.md`. Preserve all official instructions. The appended section must point to the product/design artifacts, forbid controls outside `interaction-map.json`, and require `verify-app.sh` plus the independent review gate.
 
-### 5. Build
+### 6. Build
 
 Explicitly invoke `$eazo-build` with:
 
@@ -147,7 +185,7 @@ Explicitly invoke `$eazo-build` with:
 - all product and design artifact paths;
 - expected output: implemented source and passing deterministic verification.
 
-### 6. Verify
+### 7. Verify
 
 Run:
 
@@ -157,7 +195,7 @@ bash <plugin-root>/scripts/verify-app.sh <app-directory>
 
 Do not proceed while deterministic blocking findings remain.
 
-### 7. Preview
+### 8. Preview
 
 Run:
 
@@ -167,7 +205,7 @@ bash <plugin-root>/scripts/start-preview.sh <app-directory>
 
 Record the returned URL.
 
-### 8. Independent review
+### 9. Independent review
 
 The Builder cannot approve its own work.
 
@@ -181,7 +219,7 @@ The Builder cannot approve its own work.
 
 If no independent reviewer context can be created, stop. Self-review is not an acceptable fallback.
 
-### 9. Optional fix and re-review
+### 10. Optional fix and re-review
 
 When the verdict fails:
 
@@ -193,7 +231,7 @@ When the verdict fails:
 
 Allow at most one fix-and-review cycle. Never weaken product requirements, the interaction map, verifier, or rubric to obtain a pass. If the second verdict fails, return the app path, preview command, and bounded fix list instead of continuing to spend tokens.
 
-### 10. Final preview
+### 11. Final preview
 
 Start or confirm the final healthy preview only when:
 

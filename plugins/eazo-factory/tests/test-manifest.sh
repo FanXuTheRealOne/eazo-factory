@@ -27,26 +27,29 @@ if (interfaceBlock.shortDescription !== "Generate a bilingual, reviewed Eazo app
 }
 if (
   interfaceBlock.longDescription !==
-  "Eazo Factory turns one product prompt into a standardized bilingual Eazo app using the official Eazo Next.js template, a $imagegen UI reference board with an asset library, deterministic checks, mandatory independent review, and built-in onboarding for first-time users."
+  "Eazo Factory turns one product prompt, Xiaohongshu link, or screenshot set into a standardized bilingual Eazo app using the official Eazo Next.js template, a $imagegen UI reference board with an asset library, deterministic checks, mandatory independent review, and built-in onboarding for first-time users."
 ) {
   throw new Error("wrong longDescription");
 }
 if (interfaceBlock.developerName !== "EazoAI") throw new Error("wrong developerName");
 if (interfaceBlock.category !== "Developer Tools") throw new Error("wrong category");
 if (!Array.isArray(interfaceBlock.capabilities)) throw new Error("capabilities must be an array");
-if (interfaceBlock.capabilities.length !== 3) throw new Error("wrong capabilities length");
+if (interfaceBlock.capabilities.length !== 4) throw new Error("wrong capabilities length");
 if (interfaceBlock.capabilities[0] !== "Generate standardized Eazo apps from the official template") {
   throw new Error("wrong first capability");
 }
-if (interfaceBlock.capabilities[1] !== "Create UI reference boards with reusable asset libraries") {
+if (interfaceBlock.capabilities[1] !== "Extract app briefs from Xiaohongshu links and screenshots") {
   throw new Error("wrong second capability");
 }
-if (interfaceBlock.capabilities[2] !== "Audit every interactive control with an independent reviewer") {
+if (interfaceBlock.capabilities[2] !== "Create UI reference boards with reusable asset libraries") {
   throw new Error("wrong third capability");
+}
+if (interfaceBlock.capabilities[3] !== "Audit every interactive control with an independent reviewer") {
+  throw new Error("wrong fourth capability");
 }
 if (!Array.isArray(interfaceBlock.defaultPrompt)) throw new Error("defaultPrompt must be an array");
 if (interfaceBlock.defaultPrompt.length !== 1) throw new Error("wrong defaultPrompt length");
-if (interfaceBlock.defaultPrompt[0] !== "Use @eazo-factory to show onboarding or create one standardized Eazo app.") {
+if (interfaceBlock.defaultPrompt[0] !== "Use @eazo-factory to show onboarding or create one Eazo app from a prompt, link, or screenshots.") {
   throw new Error("wrong defaultPrompt value");
 }
 if (interfaceBlock.brandColor !== "#2F5D50") throw new Error("wrong brandColor");
