@@ -192,7 +192,7 @@ Source intake rules:
 
 1. Explicitly invoke `$eazo-source` with the user's source material and staging directory.
 2. Expected output: `<staging>/source/source-brief.json`.
-3. If `$eazo-source` reports that a link is inaccessible and no screenshot/text contains enough information, stop and ask for screenshots in one concise sentence.
+3. If `$eazo-source` reports that a Xiaohongshu link is blocked by login or verification and no screenshot/text contains enough information, stop with one concise sentence telling the user to 登录自己的小红书账号, 重新发送同一个链接, or 补充帖子截图.
 4. Pass `source/source-brief.json` into `$eazo-idea` and `$eazo-design`.
 5. Preserve the source's product intent, UI structure, visual motifs, content hierarchy, copy tone, and key elements. Create original Eazo UI; do not copy watermarks, creator identity, private data, or long verbatim captions.
 
@@ -258,7 +258,7 @@ Explicitly invoke `$eazo-source` with:
 - staging directory as target;
 - expected output: `<staging>/source/source-brief.json`.
 
-If source extraction succeeds with medium or high confidence, continue without asking for more user text. If extraction confidence is low but still contains a usable product intent, continue and let `$eazo-idea` simplify it. If the source is inaccessible and not enough screenshot/text evidence exists, record a failed source state and stop with one sentence asking for screenshots.
+If source extraction succeeds with medium or high confidence, continue without asking for more user text. If extraction confidence is low but still contains a usable product intent, continue and let `$eazo-idea` simplify it. If a Xiaohongshu link is blocked by login/verification and not enough screenshot/text evidence exists, record a failed source state and stop with one sentence telling the user to log in to their own Xiaohongshu account, resend the same link, or upload screenshots. If the source is otherwise inaccessible and not enough screenshot/text evidence exists, record a failed source state and stop with one sentence asking for screenshots.
 
 ### 3. Idea
 

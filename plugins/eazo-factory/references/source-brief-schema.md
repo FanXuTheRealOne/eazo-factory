@@ -7,6 +7,8 @@ Rules:
 - Preserve product intent, UI structure, visual motifs, and copy tone.
 - Do not copy creator identity, watermarks, private profile data, or long verbatim text. Convert source material into an original Eazo app brief.
 - If the source is inaccessible and no screenshots or text are available, stop with one concise request for screenshots.
+- If a Xiaohongshu source is blocked by login or verification, treat it as `login-required`: do not create a brief from guesses; tell the user they should log in to Xiaohongshu in their local browser and resend the same link, or upload screenshots as a fallback.
+- `login-required` means the user should log in locally before retrying the same URL; screenshots remain the fallback when authentication still blocks access.
 
 ```json
 {

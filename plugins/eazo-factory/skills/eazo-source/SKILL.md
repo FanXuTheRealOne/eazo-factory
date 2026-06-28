@@ -23,7 +23,10 @@ Turn source material into a compact app brief. Do not scaffold, design, or write
    - If a Xiaohongshu tool is available and authenticated, use it to fetch the note detail when feed id/token can be derived.
    - Otherwise use browser/web access when available.
    - Always inspect user-provided screenshots/images directly when present.
-   - If the link is blocked and no screenshot/text gives enough detail, stop with one sentence asking for screenshots.
+   - If the link hits a login wall, anti-bot page, verification wall, or empty/blocked response, do not guess. Ask the user to log in to Xiaohongshu in their local browser, then retry the link. Also mention screenshots as a fallback.
+   - In English contexts, phrase this as: ask the user to log in to Xiaohongshu in their local browser, then retry the link, or provide screenshots as a fallback.
+   - If the link is still blocked and no screenshot/text gives enough detail, stop with one sentence asking for screenshots.
+   - Do not claim the source was extracted unless you actually saw usable post content, screenshots, or pasted text.
 4. Produce one concise `source/source-brief.json`:
    - product intent;
    - target user;
@@ -38,6 +41,20 @@ Turn source material into a compact app brief. Do not scaffold, design, or write
    - `product_intent`, `target_user`, and `primary_loop` are non-empty;
    - at least one feature candidate exists;
    - `confidence` is `high`, `medium`, or `low`.
+
+## Login wall response
+
+When Xiaohongshu blocks access and no usable screenshots/text are available, return no `source/source-brief.json`. Stop with this one-sentence shape in the user's language:
+
+```text
+这个小红书链接现在被登录/验证挡住了；请先在本地浏览器登录自己的小红书账号后重新发送同一个链接，或者直接补充帖子截图，我再继续复刻。
+```
+
+For English:
+
+```text
+This Xiaohongshu link is behind a login/verification wall; please log in to Xiaohongshu in your local browser and send the same link again, or upload screenshots as a fallback.
+```
 
 ## Output
 
