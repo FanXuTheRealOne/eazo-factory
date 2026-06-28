@@ -7,6 +7,36 @@ description: Create one complete Eazo app from an idea or product request, inclu
 
 Create one independent app per invocation. Do not batch, deploy, publish, or push a remote repository. Prefer compact artifacts and one decisive pass over verbose planning.
 
+## Onboarding mode
+
+When the user invokes this plugin without a concrete app brief, do not run preflight, create files, call `$imagegen`, scaffold, or start a review. Instead, reply with a short onboarding guide in the user's language.
+
+Trigger onboarding when the request is empty, only names `@eazo-factory`, or mainly asks any of:
+
+- how to use this plugin;
+- what this plugin does;
+- onboarding, help, usage, examples, prompt template;
+- 怎么用, 能做什么, 介绍一下, 新手引导, 示例.
+
+Onboarding response shape:
+
+1. One-sentence purpose: Eazo Factory creates one bilingual Eazo app from one product brief.
+2. What it will produce: product spec, UI reference board, asset library, official-template code, verification, independent review, preview URL.
+3. Best prompt template:
+
+   ```text
+   @eazo-factory 创建一个 [app 类型]，给 [目标用户] 用，核心功能是 [一句话]，风格参考 [艺术/情绪/品牌]，保存到 [输出目录]
+   ```
+
+4. Three concise example prompts:
+   - meditation / wellness;
+   - journal / reflection;
+   - functional utility.
+5. Requirements: Codex with image generation, Git, Bun, Node, access to the Eazo template.
+6. Ask the user to send one app brief when ready.
+
+Keep onboarding under 220 Chinese characters or 160 English words unless the user asks for details.
+
 ## Resolve paths
 
 Determine:

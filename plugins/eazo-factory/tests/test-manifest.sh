@@ -27,7 +27,7 @@ if (interfaceBlock.shortDescription !== "Generate a bilingual, reviewed Eazo app
 }
 if (
   interfaceBlock.longDescription !==
-  "Eazo Factory turns one product prompt into a standardized bilingual Eazo app using the official Eazo Next.js template, a $imagegen UI reference board with an asset library, deterministic checks, and mandatory independent review."
+  "Eazo Factory turns one product prompt into a standardized bilingual Eazo app using the official Eazo Next.js template, a $imagegen UI reference board with an asset library, deterministic checks, mandatory independent review, and built-in onboarding for first-time users."
 ) {
   throw new Error("wrong longDescription");
 }
@@ -46,7 +46,7 @@ if (interfaceBlock.capabilities[2] !== "Audit every interactive control with an 
 }
 if (!Array.isArray(interfaceBlock.defaultPrompt)) throw new Error("defaultPrompt must be an array");
 if (interfaceBlock.defaultPrompt.length !== 1) throw new Error("wrong defaultPrompt length");
-if (interfaceBlock.defaultPrompt[0] !== "Use @eazo-factory to create one standardized Eazo app.") {
+if (interfaceBlock.defaultPrompt[0] !== "Use @eazo-factory to show onboarding or create one standardized Eazo app.") {
   throw new Error("wrong defaultPrompt value");
 }
 if (interfaceBlock.brandColor !== "#2F5D50") throw new Error("wrong brandColor");
