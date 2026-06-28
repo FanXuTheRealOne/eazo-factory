@@ -9,7 +9,7 @@
   "interface": {
     "displayName": "Eazo Factory",
     "shortDescription": "Generate a bilingual, reviewed Eazo app from one prompt.",
-    "longDescription": "Eazo Factory turns one product prompt, Xiaohongshu link, or screenshot set into a standardized bilingual Eazo app using the official Eazo Next.js template, a $imagegen UI reference board with an asset library, deterministic checks, mandatory independent review, and built-in onboarding for first-time users.",
+    "longDescription": "Eazo Factory turns one product prompt, Xiaohongshu link, or screenshot set into a standardized bilingual Eazo app using the official Eazo Next.js template, a $imagegen UI reference board with an asset library, deterministic checks, mandatory independent review, and a visual onboarding guide for first-time users.",
     "developerName": "EazoAI",
     "category": "Developer Tools",
     "capabilities": [
@@ -19,7 +19,7 @@
       "Audit every interactive control with an independent reviewer"
     ],
     "defaultPrompt": [
-      "Use @eazo-factory to show onboarding or create one Eazo app from a prompt, link, or screenshots."
+      "Use @eazo-factory to show visual onboarding or create one Eazo app from a prompt, link, or screenshots."
     ],
     "brandColor": "#2F5D50"
   }

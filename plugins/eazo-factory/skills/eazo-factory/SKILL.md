@@ -20,22 +20,46 @@ Trigger onboarding when the request is empty, only names `@eazo-factory`, or mai
 
 Onboarding response shape:
 
-1. One-sentence purpose: Eazo Factory creates one bilingual Eazo app from one product brief.
-2. What it will produce: product spec, UI reference board, asset library, official-template code, verification, independent review, preview URL.
-3. Best prompt template:
+Use a polished Markdown welcome card in the user's language. Include emoji-based visual structure and a compact Mermaid diagram. Do not call `$imagegen`, create files, or run preflight just to render onboarding.
 
-   ```text
-   @eazo-factory 创建一个 [app 类型]，给 [目标用户] 用，核心功能是 [一句话]，风格参考 [艺术/情绪/品牌]，保存到 [输出目录]
-   ```
+Required Chinese layout:
 
-4. Three concise example prompts:
-   - meditation / wellness;
-   - journal / reflection;
-   - functional utility.
-5. Requirements: Codex with image generation, Git, Bun, Node, access to the Eazo template.
-6. Ask the user to send one app brief when ready.
+````markdown
+# ✨ Eazo Factory
 
-Keep onboarding under 220 Chinese characters or 160 English words unless the user asks for details.
+把一句想法、小红书链接、或一组截图，变成一个可预览的双语 Eazo App。
+
+```mermaid
+flowchart LR
+  A["📝 想法 / 🔗小红书 / 🖼截图"] --> B["🔍 提炼需求"]
+  B --> C["🎨 UI素材板"]
+  C --> D["🧩 官方模板开发"]
+  D --> E["✅ Review + Preview"]
+```
+
+## 你可以这样用
+
+```text
+@eazo-factory 创建一个 [app类型]，给 [目标用户] 用，核心功能是 [一句话]，风格参考 [艺术/情绪/品牌]，保存到 [输出目录]
+```
+
+## 案例
+
+- 🧘 `@eazo-factory 创建一个马蒂斯剪纸风两分钟冥想 App，给焦虑上班族用，保存到桌面`
+- 🔗 `@eazo-factory 从这个小红书链接复刻成一个 Eazo App: https://www.xiaohongshu.com/...`
+- 🖼 `@eazo-factory 按这几张小红书截图做成一个打卡/日记 App`
+- 🧮 `@eazo-factory 创建一个极简 BMI 计算器 App，功能型，不需要 BGM`
+
+## 我会产出
+
+`需求提炼 → UI素材板 → 官方模板代码 → 验证 → 独立Review → 本地Preview`
+
+准备好了，直接把想法、链接、或截图丢给我。
+````
+
+For English users, keep the same structure translated into English with equivalent examples.
+
+Keep onboarding under 520 Chinese characters or 280 English words unless the user asks for details.
 
 ## Source-material mode
 
