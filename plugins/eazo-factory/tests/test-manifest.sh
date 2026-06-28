@@ -13,7 +13,7 @@ const manifest = JSON.parse(
   fs.readFileSync(path.join(pluginRoot, ".codex-plugin/plugin.json"), "utf8"),
 );
 if (manifest.name !== "eazo-factory") throw new Error("wrong plugin name");
-if (manifest.version !== "0.1.1") throw new Error("wrong plugin version");
+if (manifest.version !== "0.1.2") throw new Error("wrong plugin version");
 if (manifest.skills !== "./skills/") throw new Error("wrong skills path");
 if (manifest.author?.name !== "EazoAI") throw new Error("wrong author name");
 

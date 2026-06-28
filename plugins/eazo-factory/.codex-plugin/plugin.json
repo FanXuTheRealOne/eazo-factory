@@ -1,6 +1,6 @@
 {
   "name": "eazo-factory",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Generate bilingual, polished Eazo apps with Codex.",
   "author": {
     "name": "EazoAI"

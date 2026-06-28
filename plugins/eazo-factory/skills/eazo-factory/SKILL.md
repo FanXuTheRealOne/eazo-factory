@@ -9,7 +9,7 @@ Create one independent app per invocation. Do not batch, deploy, publish, or pus
 
 ## Onboarding mode
 
-When the user invokes this plugin without a concrete app brief, do not run preflight, create files, call `$imagegen`, scaffold, or start a review. Instead, reply with a short onboarding guide in the user's language.
+When the user invokes this plugin without a concrete app brief, do not run preflight, create files, call `$imagegen`, scaffold, or start a review. Instead, reply with a short onboarding guide in the user's language. If the request is only `@eazo-factory` and there is any Chinese in the surrounding conversation or product context, answer in Chinese. If no language signal exists, default to Chinese for this plugin.
 
 Trigger onboarding when the request is empty, only names `@eazo-factory`, or mainly asks any of:
 
@@ -20,7 +20,7 @@ Trigger onboarding when the request is empty, only names `@eazo-factory`, or mai
 
 Onboarding response shape:
 
-Use a polished Markdown welcome card in the user's language. Include emoji-based visual structure and a compact Mermaid diagram. Do not call `$imagegen`, create files, or run preflight just to render onboarding.
+Use a polished Markdown welcome card in the user's language. Include emoji-based visual structure, a compact Mermaid diagram, and three numbered usage cards with small text/emoji illustrations. Do not call `$imagegen`, create files, or run preflight just to render onboarding.
 
 Required Chinese layout:
 
@@ -37,18 +37,57 @@ flowchart LR
   D --> E["✅ Review + Preview"]
 ```
 
-## 你可以这样用
+## 三种使用方式
 
+### 1. 一句话生成 App
+
+📌 适合：你已经知道想做什么，比如冥想、日记、工具、小游戏。
+🧩 你怎么发：说清楚 app 类型、用户、核心功能、风格、保存位置。
+🖼 效果示意：
 ```text
-@eazo-factory 创建一个 [app类型]，给 [目标用户] 用，核心功能是 [一句话]，风格参考 [艺术/情绪/品牌]，保存到 [输出目录]
+💬 一句话想法
+   ↓
+🎨 UI素材板 + 🧩 官方模板
+   ↓
+📱 可运行 App
 ```
 
-## 案例
+复制示例：
+```text
+@eazo-factory 创建一个马蒂斯剪纸风两分钟冥想 App，给焦虑上班族用，保存到桌面
+```
 
-- 🧘 `@eazo-factory 创建一个马蒂斯剪纸风两分钟冥想 App，给焦虑上班族用，保存到桌面`
-- 🔗 `@eazo-factory 从这个小红书链接复刻成一个 Eazo App: https://www.xiaohongshu.com/...`
-- 🖼 `@eazo-factory 按这几张小红书截图做成一个打卡/日记 App`
-- 🧮 `@eazo-factory 创建一个极简 BMI 计算器 App，功能型，不需要 BGM`
+### 2. 从小红书链接复刻
+
+📌 适合：你看到一篇小红书内容，想把它变成互动 App。
+🧩 你怎么发：直接丢链接；如果链接打不开，再补截图。
+🖼 效果示意：
+```text
+🔗 小红书帖子
+   ↓ 提炼内容 / 结构 / 视觉元素
+📱 原创 Eazo 交互 App
+```
+
+复制示例：
+```text
+@eazo-factory 从这个小红书链接复刻成一个 Eazo App: https://www.xiaohongshu.com/...
+```
+
+### 3. 从截图/素材生成
+
+📌 适合：你有多张帖子截图、UI参考、素材板，想让我理解后复刻。
+🧩 你怎么发：上传截图，然后一句话说“按这些做”。
+🖼 效果示意：
+```text
+🖼 截图组 / 素材板
+   ↓ 识别文案 / 组件 / 色彩
+🌐 双语 Eazo App
+```
+
+复制示例：
+```text
+@eazo-factory 按这几张小红书截图做成一个打卡/日记 App
+```
 
 ## 我会产出
 
@@ -57,9 +96,81 @@ flowchart LR
 准备好了，直接把想法、链接、或截图丢给我。
 ````
 
-For English users, keep the same structure translated into English with equivalent examples.
+For English users, use this equivalent layout:
 
-Keep onboarding under 520 Chinese characters or 280 English words unless the user asks for details.
+````markdown
+# ✨ Eazo Factory
+
+Turn one idea, Xiaohongshu link, or screenshot set into a previewable bilingual Eazo App.
+
+```mermaid
+flowchart LR
+  A["📝 Idea / 🔗 Link / 🖼 Screenshots"] --> B["🔍 Extract brief"]
+  B --> C["🎨 UI asset board"]
+  C --> D["🧩 Official template build"]
+  D --> E["✅ Review + Preview"]
+```
+
+## 3 ways to use it
+
+### 1. Build from one sentence
+
+📌 Best for: meditation, journal, utility, mini-game, or any app idea you can describe.
+🧩 What to send: app type, audience, core function, style, and output folder.
+🖼 Visual cue:
+```text
+💬 One app idea
+   ↓
+🎨 UI board + 🧩 official template
+   ↓
+📱 Working app
+```
+
+Copy example:
+```text
+@eazo-factory Create a Matisse cut-paper two-minute meditation app for anxious office workers, save to Desktop
+```
+
+### 2. Recreate from a Xiaohongshu link
+
+📌 Best for: turning a post or carousel into an interactive app.
+🧩 What to send: paste the link; add screenshots if the link is blocked.
+🖼 Visual cue:
+```text
+🔗 Xiaohongshu post
+   ↓ content / layout / motifs
+📱 Original Eazo interaction
+```
+
+Copy example:
+```text
+@eazo-factory Turn this Xiaohongshu link into an Eazo app: https://www.xiaohongshu.com/...
+```
+
+### 3. Build from screenshots/assets
+
+📌 Best for: screenshots, UI references, moodboards, or visual assets.
+🧩 What to send: upload images, then say what kind of app to make.
+🖼 Visual cue:
+```text
+🖼 Screenshots / assets
+   ↓ copy / components / colors
+🌐 Bilingual Eazo app
+```
+
+Copy example:
+```text
+@eazo-factory Make a check-in / journal app from these screenshots
+```
+
+## What I’ll produce
+
+`product scope → UI reference board → official template code → verification → independent review → local preview`
+
+Drop me the idea, link, or screenshots when you’re ready.
+````
+
+Keep onboarding under 900 Chinese characters or 460 English words unless the user asks for details.
 
 ## Source-material mode
 
