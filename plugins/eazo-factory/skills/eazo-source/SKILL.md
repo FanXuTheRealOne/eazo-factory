@@ -27,19 +27,28 @@ Turn source material into a compact app brief. Do not scaffold, design, or write
    - In English contexts, phrase this as: ask the user to log in to Xiaohongshu in their local browser, then retry the link, or provide screenshots as a fallback.
    - If the link is still blocked and no screenshot/text gives enough detail, stop with one sentence asking for screenshots.
    - Do not claim the source was extracted unless you actually saw usable post content, screenshots, or pasted text.
-4. Produce one concise `source/source-brief.json`:
+4. Capture reference UI images. When the source is a Xiaohongshu link, a product/intro screenshot, or any visual material that shows UI and interaction, you MUST save the referenced UI as image files so the design stage can feed them into `$imagegen`:
+   - Save every user-provided screenshot or image to `<app-directory>/source/reference-ui/` as `.png` or `.jpg`.
+   - When you can load the Xiaohongshu note through a tool or browser, capture or download its post images (UI cards, carousel frames, layout) into the same directory.
+   - Use stable, ordered filenames such as `ref-01.png`, `ref-02.png`.
+   - Record every saved file in `reference_ui_images` with a short description and its `origin`.
+   - Strip or ignore watermarks and creator identity, but keep the referenced UI layout, components, and visual structure intact.
+   - Skip this capture ONLY when the user explicitly says not to use a reference image, or specifies a different UI/style to build instead. When skipped, leave `reference_ui_images` empty and record the reason in `reference_ui_note`.
+5. Produce one concise `source/source-brief.json`:
    - product intent;
    - target user;
    - primary loop;
    - feature candidates with source evidence;
    - UI observations: layout, components, visual style, imagery, copy tone, motion/audio clues;
+   - `reference_ui_images` captured in step 4 (and `reference_ui_note` when capture was skipped);
    - must-recreate items;
    - avoid-copying items.
-5. Convert source material into an original Eazo app direction. Preserve idea and UI logic, not watermarks, creator names, private data, or long verbatim captions.
-6. Parse the written JSON and validate:
+6. Convert source material into an original Eazo app direction. Preserve idea and UI logic, not watermarks, creator names, private data, or long verbatim captions.
+7. Parse the written JSON and validate:
    - `schema_version` is `"1.0"`;
    - `product_intent`, `target_user`, and `primary_loop` are non-empty;
    - at least one feature candidate exists;
+   - for a visual source, `reference_ui_images` is non-empty unless the user opted out (then `reference_ui_note` explains why);
    - `confidence` is `high`, `medium`, or `low`.
 
 ## Login wall response
@@ -58,4 +67,4 @@ This Xiaohongshu link is behind a login/verification wall; please log in to Xiao
 
 ## Output
 
-Return the absolute `source/source-brief.json` path, source type, confidence, and one-line product intent.
+Return the absolute `source/source-brief.json` path, source type, confidence, the number of captured reference UI images (or the opt-out reason), and one-line product intent.

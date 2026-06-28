@@ -5,6 +5,7 @@ Purpose: normalized brief extracted from source material such as Xiaohongshu lin
 Rules:
 - Use this only when the user provides source material instead of, or in addition to, a direct app prompt.
 - Preserve product intent, UI structure, visual motifs, and copy tone.
+- For visual sources (Xiaohongshu links, product/intro screenshots, or any UI/interaction reference), you MUST capture the referenced UI as saved image files under `source/reference-ui/` and list them in `reference_ui_images`. These images are passed to `$imagegen` during design as visual references. Skip capture only when the user explicitly opts out or specifies a different UI/style; record that in `reference_ui_note`.
 - Do not copy creator identity, watermarks, private profile data, or long verbatim text. Convert source material into an original Eazo app brief.
 - If the source is inaccessible and no screenshots or text are available, stop with one concise request for screenshots.
 - If a Xiaohongshu source is blocked by login or verification, treat it as `login-required`: do not create a brief from guesses; tell the user they should log in to Xiaohongshu in their local browser and resend the same link, or upload screenshots as a fallback.
@@ -41,6 +42,15 @@ Rules:
     "copy_tone": "encouraging, short, social-post style",
     "motion_audio_clues": ["timer pulse", "subtle completion chime"]
   },
+  "reference_ui_images": [
+    {
+      "id": "ref-01",
+      "path": "source/reference-ui/ref-01.png",
+      "origin": "user_screenshot",
+      "description": "Original post card layout captured as a UI reference for $imagegen"
+    }
+  ],
+  "reference_ui_note": "",
   "must_recreate": ["daily challenge loop", "progress feeling", "warm motivational tone"],
   "avoid_copying": ["creator handle", "watermark", "exact long captions"],
   "confidence": "high",

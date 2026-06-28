@@ -12,7 +12,7 @@ Turn the approved product contract into a functional visual contract before appl
 Read these files completely:
 
 - `<app-directory>/product-spec.json`
-- `<app-directory>/source/source-brief.json` when present
+- `<app-directory>/source/source-brief.json` when present, including any `reference_ui_images` saved under `<app-directory>/source/reference-ui/`
 - `../../references/design-system-schema.md`
 - `../../references/interaction-map-schema.md`
 - `../../references/asset-library-schema.md`
@@ -50,6 +50,9 @@ Choose the art direction that best serves the product. Use a user-requested dire
    > Use the source material as product and visual inspiration: preserve its app idea, hierarchy, important UI elements, mood, and reusable visual parts. Create an original Eazo interface; do not copy watermarks, creator names, private profile data, or long captions verbatim.
 
 6. Explicitly invoke `$imagegen` with that prompt and save one polished mobile reference board to `<app-directory>/design/ui-reference.png`.
+   - When `source/source-brief.json` lists `reference_ui_images` and those files exist under `<app-directory>/source/reference-ui/`, you MUST pass them to `$imagegen` as visual reference inputs so the generated board follows the referenced UI layout, components, and visual structure.
+   - Skip passing the reference images ONLY when the user explicitly asked not to use a reference image, or specified a different UI/style to build instead (as recorded in `reference_ui_note`).
+   - Still produce an original Eazo interface: follow the referenced UI structure but do not reproduce watermarks, creator identity, or private data.
 7. Inspect the generated image rather than trusting the prompt:
    - inventory every visible button-like or actionable element;
    - compare it against `interaction-map.json`;

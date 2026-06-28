@@ -194,7 +194,8 @@ Source intake rules:
 2. Expected output: `<staging>/source/source-brief.json`.
 3. If `$eazo-source` reports that a Xiaohongshu link is blocked by login or verification and no screenshot/text contains enough information, stop with one concise sentence telling the user to 登录自己的小红书账号, 重新发送同一个链接, or 补充帖子截图.
 4. Pass `source/source-brief.json` into `$eazo-idea` and `$eazo-design`.
-5. Preserve the source's product intent, UI structure, visual motifs, content hierarchy, copy tone, and key elements. Create original Eazo UI; do not copy watermarks, creator identity, private data, or long verbatim captions.
+5. For any visual source (Xiaohongshu link, product/intro screenshot, or UI/interaction reference), require `$eazo-source` to capture the referenced UI into `<staging>/source/reference-ui/` and list it in `reference_ui_images`. `$eazo-design` must pass those images into `$imagegen` as visual references, unless the user explicitly opted out of a reference image or specified a different UI/style.
+6. Preserve the source's product intent, UI structure, visual motifs, content hierarchy, copy tone, and key elements. Create original Eazo UI; do not copy watermarks, creator identity, private data, or long verbatim captions.
 
 ## Resolve paths
 
