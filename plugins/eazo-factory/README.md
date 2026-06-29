@@ -4,10 +4,10 @@ Generate one polished, bilingual, independently reviewed Eazo app from a product
 
 ## Install from GitHub
 
-The intended public repository is `EazoAI/eazo-factory`:
+The public repository is `FanXuTheRealOne/eazo-factory`:
 
 ```bash
-codex plugin marketplace add EazoAI/eazo-factory
+codex plugin marketplace add FanXuTheRealOne/eazo-factory
 codex plugin add eazo-factory@eazo-tools
 ```
 
@@ -47,6 +47,8 @@ For first-time help, invoke the plugin without an app brief:
 The plugin will show a visual onboarding card with a small flow illustration and example prompts instead of starting generation.
 
 The workflow can extract a source brief from links or screenshots, then produces a product specification, `$imagegen` UI reference board, reusable asset library, interaction map, official-template implementation, deterministic verification, independent browser review, control audit, and local preview.
+
+For the full bilingual project guide, see the repository root `README.md`.
 
 ## Requirements
 
