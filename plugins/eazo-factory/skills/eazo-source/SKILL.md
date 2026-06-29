@@ -20,7 +20,13 @@ Turn source material into a compact app brief. Do not scaffold, design, or write
    - `screenshots` for attached images;
    - `mixed` when both links and screenshots/text are present.
 3. Extract source facts:
-   - If a Xiaohongshu tool is available and authenticated, use it to fetch the note detail when feed id/token can be derived.
+   - XHS MCP first: for Xiaohongshu URLs, first look for an available XHS MCP / Xiaohongshu MCP tool that can use an authenticated browser profile. If present, use it before generic browser or web access.
+   - With XHS MCP, open the note URL through the MCP tool and extract note detail: title, author-visible public metadata, caption/body text, tags, image URLs/files, video cover or video metadata when available, and page screenshots.
+   - Save raw MCP output to `<app-directory>/source/raw/xhs-note.json`. Record the tool name in `xhs_mcp_tool` and status in `xhs_mcp_status`.
+   - Save downloaded post images, screenshots, video covers, and other usable media under `<app-directory>/source/media/`.
+   - Copy or capture all UI-relevant post images/screenshots into `<app-directory>/source/reference-ui/` and list them in `reference_ui_images`.
+   - If the XHS MCP exists but reports expired cookies, login wall, QR-login needed, CAPTCHA, anti-bot, or verification, set `xhs_mcp_status` to `login_required` or `blocked`, do not guess, and ask the user to log in through the MCP-controlled browser or upload screenshots.
+   - If no XHS MCP tool is available, set `xhs_mcp_status` to `mcp_unavailable` and continue with generic browser/web access when available.
    - Otherwise use browser/web access when available.
    - Always inspect user-provided screenshots/images directly when present.
    - If the link hits a login wall, anti-bot page, verification wall, or empty/blocked response, do not guess. Ask the user to log in to Xiaohongshu in their local browser, then retry the link. Also mention screenshots as a fallback.
@@ -41,6 +47,7 @@ Turn source material into a compact app brief. Do not scaffold, design, or write
    - feature candidates with source evidence;
    - UI observations: layout, components, visual style, imagery, copy tone, motion/audio clues;
    - `reference_ui_images` captured in step 4 (and `reference_ui_note` when capture was skipped);
+   - XHS MCP fields when the source is Xiaohongshu: `xhs_mcp_status`, `xhs_mcp_tool`, and `xhs_mcp_artifacts`;
    - must-recreate items;
    - avoid-copying items.
 6. Convert source material into an original Eazo app direction. Preserve idea and UI logic, not watermarks, creator names, private data, or long verbatim captions.

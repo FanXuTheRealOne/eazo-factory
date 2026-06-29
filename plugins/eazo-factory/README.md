@@ -48,6 +48,8 @@ The plugin will show a visual onboarding card with a small flow illustration and
 
 The workflow can extract a source brief from links or screenshots, then produces a product specification, `$imagegen` UI reference board, reusable asset library, interaction map, official-template implementation, deterministic verification, independent browser review, control audit, and local preview.
 
+When an authenticated XHS MCP / Xiaohongshu MCP tool is available, source intake tries it before generic browser access. Successful MCP extraction writes `source/raw/xhs-note.json`, `source/media/`, and `source/reference-ui/` before the design stage.
+
 ## Batch use
 
 From Codex:
@@ -67,6 +69,19 @@ node plugins/eazo-factory/bin/eazo-batch.mjs run ./links.txt \
 Use `--dry-run` first if you only want to inspect generated prompts and `batch-report.json`.
 
 The batch runner launches separate `codex exec` workers. Each worker invokes `@eazo-factory` for one source and writes its own `prompt.txt`, `final.md`, logs, app directory, and status entry.
+
+## Xiaohongshu MCP use
+
+1. Start a community XHS MCP server that supports browser login.
+2. Log in to Xiaohongshu inside the MCP-controlled browser.
+3. Restart Codex or reload MCP tools.
+4. Invoke Eazo Factory normally:
+
+```text
+@eazo-factory 从这个小红书链接复刻成一个 Eazo app: https://www.xiaohongshu.com/...
+```
+
+If the MCP is unavailable, the workflow falls back to browser/web access or screenshots. If the MCP browser needs login or hits verification, the workflow stops and asks for login or screenshots instead of guessing.
 
 For the full bilingual project guide, see the repository root `README.md`.
 

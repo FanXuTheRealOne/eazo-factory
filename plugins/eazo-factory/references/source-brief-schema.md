@@ -10,6 +10,7 @@ Rules:
 - If the source is inaccessible and no screenshots or text are available, stop with one concise request for screenshots.
 - If a Xiaohongshu source is blocked by login or verification, treat it as `login-required`: do not create a brief from guesses; tell the user they should log in to Xiaohongshu in their local browser and resend the same link, or upload screenshots as a fallback.
 - `login-required` means the user should log in locally before retrying the same URL; screenshots remain the fallback when authentication still blocks access.
+- For Xiaohongshu sources, prefer XHS MCP when available. Record `xhs_mcp_status` as `success`, `mcp_unavailable`, `login_required`, `blocked`, or `failed`. Save raw MCP note detail to `source/raw/xhs-note.json` when available, and list saved raw/media/reference artifacts in `xhs_mcp_artifacts`.
 
 ```json
 {
@@ -21,6 +22,20 @@ Rules:
       "id": "screenshot-1",
       "type": "screenshot",
       "description": "Mobile post screenshot showing a habit card layout and handwritten annotations"
+    }
+  ],
+  "xhs_mcp_status": "success",
+  "xhs_mcp_tool": "xhs.get_note_detail",
+  "xhs_mcp_artifacts": [
+    {
+      "type": "raw_note_detail",
+      "path": "source/raw/xhs-note.json",
+      "description": "Raw note detail returned by the authenticated XHS MCP tool"
+    },
+    {
+      "type": "media",
+      "path": "source/media/image-01.jpg",
+      "description": "Downloaded post image from the note"
     }
   ],
   "extracted_text": ["30 day plank challenge", "tap to start today's set"],
