@@ -32,7 +32,7 @@ Turn source material into a compact app brief. Do not scaffold, design, or write
    - When you can load the Xiaohongshu note through a tool or browser, capture or download its post images (UI cards, carousel frames, layout) into the same directory.
    - Use stable, ordered filenames such as `ref-01.png`, `ref-02.png`.
    - Record every saved file in `reference_ui_images` with a short description and its `origin`.
-   - Strip or ignore watermarks and creator identity, but keep the referenced UI layout, components, and visual structure intact.
+   - Do not reproduce watermarks or creator identity in the generated app, source brief, or image prompt. Crop only when useful; otherwise keep the reference image unchanged so layout, components, and visual structure remain visible.
    - Skip this capture ONLY when the user explicitly says not to use a reference image, or specifies a different UI/style to build instead. When skipped, leave `reference_ui_images` empty and record the reason in `reference_ui_note`.
 5. Produce one concise `source/source-brief.json`:
    - product intent;

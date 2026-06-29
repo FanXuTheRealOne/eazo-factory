@@ -39,7 +39,7 @@ const outputPath = process.argv[2];
 const now = process.argv[3];
 const payload = {
   schema_version: "1.0",
-  plugin_version: "0.1.3",
+  plugin_version: "0.1.4",
   status: "in_progress",
   stage: "preflight",
   stage_history: [
