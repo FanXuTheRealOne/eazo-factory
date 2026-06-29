@@ -16,7 +16,7 @@ Rules:
 ```json
 {
   "schema_version": "1.0",
-  "plugin_version": "0.1.4",
+  "plugin_version": "0.1.5",
   "status": "in_progress",
   "stage": "design",
   "stage_history": [

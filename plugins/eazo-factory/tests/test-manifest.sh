@@ -13,7 +13,7 @@ const manifest = JSON.parse(
   fs.readFileSync(path.join(pluginRoot, ".codex-plugin/plugin.json"), "utf8"),
 );
 if (manifest.name !== "eazo-factory") throw new Error("wrong plugin name");
-if (manifest.version !== "0.1.4") throw new Error("wrong plugin version");
+if (manifest.version !== "0.1.5") throw new Error("wrong plugin version");
 if (manifest.skills !== "./skills/") throw new Error("wrong skills path");
 if (manifest.author?.name !== "EazoAI") throw new Error("wrong author name");
 
@@ -22,19 +22,19 @@ if (!interfaceBlock || typeof interfaceBlock !== "object") {
   throw new Error("missing interface block");
 }
 if (interfaceBlock.displayName !== "Eazo Factory") throw new Error("wrong displayName");
-if (interfaceBlock.shortDescription !== "Generate a bilingual, reviewed Eazo app from one prompt.") {
+if (interfaceBlock.shortDescription !== "Generate reviewed Eazo apps from prompts, links, screenshots, or batches.") {
   throw new Error("wrong shortDescription");
 }
 if (
   interfaceBlock.longDescription !==
-  "Eazo Factory turns one product prompt, Xiaohongshu link, or screenshot set into a standardized bilingual Eazo app using the official Eazo Next.js template, a $imagegen UI reference board with an asset library, deterministic checks, mandatory independent review, and a visual onboarding guide for first-time users."
+  "Eazo Factory turns one product prompt, Xiaohongshu link, screenshot set, or batch input file into standardized bilingual Eazo apps using the official Eazo Next.js template, a $imagegen UI reference board with an asset library, deterministic checks, mandatory independent review, a batch runner for parallel Codex workers, and a visual onboarding guide for first-time users."
 ) {
   throw new Error("wrong longDescription");
 }
 if (interfaceBlock.developerName !== "EazoAI") throw new Error("wrong developerName");
 if (interfaceBlock.category !== "Developer Tools") throw new Error("wrong category");
 if (!Array.isArray(interfaceBlock.capabilities)) throw new Error("capabilities must be an array");
-if (interfaceBlock.capabilities.length !== 4) throw new Error("wrong capabilities length");
+if (interfaceBlock.capabilities.length !== 5) throw new Error("wrong capabilities length");
 if (interfaceBlock.capabilities[0] !== "Generate standardized Eazo apps from the official template") {
   throw new Error("wrong first capability");
 }
@@ -47,9 +47,12 @@ if (interfaceBlock.capabilities[2] !== "Create UI reference boards with reusable
 if (interfaceBlock.capabilities[3] !== "Audit every interactive control with an independent reviewer") {
   throw new Error("wrong fourth capability");
 }
+if (interfaceBlock.capabilities[4] !== "Batch-run many sources through parallel Codex workers") {
+  throw new Error("wrong fifth capability");
+}
 if (!Array.isArray(interfaceBlock.defaultPrompt)) throw new Error("defaultPrompt must be an array");
 if (interfaceBlock.defaultPrompt.length !== 1) throw new Error("wrong defaultPrompt length");
-if (interfaceBlock.defaultPrompt[0] !== "Use @eazo-factory to show visual onboarding or create one Eazo app from a prompt, link, or screenshots.") {
+if (interfaceBlock.defaultPrompt[0] !== "Use @eazo-factory to show visual onboarding, create one Eazo app, or batch-run links from a file.") {
   throw new Error("wrong defaultPrompt value");
 }
 if (interfaceBlock.brandColor !== "#2F5D50") throw new Error("wrong brandColor");

@@ -1,6 +1,6 @@
 # Eazo Factory
 
-Generate one polished, bilingual, independently reviewed Eazo app from a product prompt using Codex and the official Eazo Next.js template.
+Generate polished, bilingual, independently reviewed Eazo apps from prompts, source links, screenshots, or batch input files using Codex and the official Eazo Next.js template.
 
 ## Install from GitHub
 
@@ -47,6 +47,26 @@ For first-time help, invoke the plugin without an app brief:
 The plugin will show a visual onboarding card with a small flow illustration and example prompts instead of starting generation.
 
 The workflow can extract a source brief from links or screenshots, then produces a product specification, `$imagegen` UI reference board, reusable asset library, interaction map, official-template implementation, deterministic verification, independent browser review, control audit, and local preview.
+
+## Batch use
+
+From Codex:
+
+```text
+@eazo-factory 帮我把 ./links.txt 里的小红书链接批量生成 Eazo App，输出到 ./outputs，最多同时跑 2 个
+```
+
+From shell:
+
+```bash
+node plugins/eazo-factory/bin/eazo-batch.mjs run ./links.txt \
+  --out ./outputs \
+  --concurrency 2
+```
+
+Use `--dry-run` first if you only want to inspect generated prompts and `batch-report.json`.
+
+The batch runner launches separate `codex exec` workers. Each worker invokes `@eazo-factory` for one source and writes its own `prompt.txt`, `final.md`, logs, app directory, and status entry.
 
 For the full bilingual project guide, see the repository root `README.md`.
 

@@ -7,7 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 CANONICAL_STARTER_URL="https://github.com/EazoAI/eazo-creator-nextjs-template.git"
 CANONICAL_STARTER_BRANCH="main"
-PLUGIN_VERSION="0.1.4"
+PLUGIN_VERSION="0.1.5"
 
 OUTPUT_ROOT="${1:-}"
 SLUG="${2:-}"

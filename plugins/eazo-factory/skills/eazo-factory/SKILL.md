@@ -5,7 +5,13 @@ description: Create one complete Eazo app from an idea or product request, inclu
 
 # Eazo Factory
 
-Create one independent app per invocation. Do not batch, deploy, publish, or push a remote repository. Prefer compact artifacts and one decisive pass over verbose planning.
+Create one independent app per normal invocation. Prefer compact artifacts and one decisive pass over verbose planning. Do not deploy, publish, or push a remote repository.
+
+## Batch mode
+
+If the user asks for 批量, 一堆链接, many links, a `links.txt`/`jobs.json` file, "100 个小红书链接", "并行", "多开 Codex", or "把当前 directory 里的 file 里的链接都生成 app", invoke `$eazo-batch` instead of the single-app workflow.
+
+Do not run the single-app stage machine in batch mode. `$eazo-batch` is responsible for launching separate `codex exec` workers, each of which invokes `@eazo-factory` for one independent app and writes `batch-report.json`.
 
 ## Onboarding mode
 
