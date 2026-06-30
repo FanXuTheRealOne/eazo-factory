@@ -61,6 +61,38 @@ Expected workflow:
 9. eazo-review verifies the app
 ```
 
+## Video demo understanding workflow
+
+For Xiaohongshu videos that introduce or demo an app, do not rely on one screenshot. The source stage should collect three lanes:
+
+```text
+post copy + speech transcript + keyframe storyboard
+```
+
+Save:
+
+```text
+source/transcript/video-transcript.txt
+source/keyframes/frame-001.png
+source/keyframes/frame-002.png
+source/storyboard.json
+```
+
+Then write `video_semantic_packet` in `source/source-brief.json`:
+
+```text
+app_meaning_summary
+app_logic_hypothesis
+feature_flow_from_video
+visual_elements_from_video
+post_copy_evidence
+speech_transcript_evidence
+keyframe_storyboard_evidence
+uncertainty_notes
+```
+
+Downstream stages should use the packet to understand what the video means before copying visual motifs. This prevents apps that look vaguely similar but do not make sense.
+
 ## Batch workflow
 
 Create `links.txt`:

@@ -17,6 +17,8 @@ Produce one bounded product contract for the Eazo Factory workflow.
 
 1. Read `../../references/product-spec-schema.md` completely.
 2. If `<app-directory>/source/source-brief.json` exists, read it and treat it as the primary brief. Use the original user text only as extra guidance.
+   - When `video_semantic_packet` exists, prioritize `app_meaning_summary`, `app_logic_hypothesis`, and `feature_flow_from_video` over isolated screenshots or decorative visuals.
+   - If source evidence conflicts, carry forward explicit speech transcript and post copy first, then keyframe storyboard details.
 3. Identify one target user, one concrete problem, and one primary loop.
 4. Keep the idea small enough for one focused mobile app:
    - define three to five features;
@@ -35,7 +37,7 @@ Produce one bounded product contract for the Eazo Factory workflow.
    - a concrete name;
    - at least one observable acceptance condition.
 10. Include `locales: ["en-US", "zh-CN"]`, copy direction for both languages, and explicit exclusions.
-11. When source-brief exists, carry its product intent, must-recreate list, and UI/content priorities into `summary`, `primary_loop`, `features`, and `exclusions`.
+11. When source-brief exists, carry its product intent, must-recreate list, and UI/content priorities into `summary`, `primary_loop`, `features`, and `exclusions`. For video sources, explicitly reflect `video_semantic_packet.app_meaning_summary` and `video_semantic_packet.app_logic_hypothesis` in the product summary and feature acceptance criteria.
 12. Write valid JSON to `<app-directory>/product-spec.json` using the exact schema.
 13. Parse the written file and validate:
    - exactly one non-empty primary loop;

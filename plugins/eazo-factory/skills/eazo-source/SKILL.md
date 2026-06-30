@@ -33,28 +33,37 @@ Turn source material into a compact app brief. Do not scaffold, design, or write
    - In English contexts, phrase this as: ask the user to log in to Xiaohongshu in their local browser, then retry the link, or provide screenshots as a fallback.
    - If the link is still blocked and no screenshot/text gives enough detail, stop with one sentence asking for screenshots.
    - Do not claim the source was extracted unless you actually saw usable post content, screenshots, or pasted text.
-4. Capture reference UI images. When the source is a Xiaohongshu link, a product/intro screenshot, or any visual material that shows UI and interaction, you MUST save the referenced UI as image files so the design stage can feed them into `$imagegen`:
+4. Build a video semantic packet for video-heavy Xiaohongshu posts. Do not infer the app from screenshots alone when the source is a video, app demo, tutorial, voiceover walkthrough, or screen recording.
+   - Combine three evidence lanes before writing product intent: post copy, speech transcript, and keyframe storyboard.
+   - Post copy: extract title, caption, visible overlay text, tags, pinned comments when available, and short UI labels. Record this as `post_copy_evidence`.
+   - Speech transcript: if the MCP/browser/source provides video audio, transcript, captions, or downloadable media, transcribe the speech or use the available transcript. Save the transcript to `<app-directory>/source/transcript/video-transcript.txt` and summarize it as `speech_transcript_evidence`. If audio cannot be accessed, record the reason in `uncertainty_notes` instead of guessing.
+   - Keyframe storyboard: capture ordered screenshots/keyframes across the video, especially scene changes, UI transitions, before/after states, feature demos, and explanatory moments. Save them under `<app-directory>/source/keyframes/` and write `<app-directory>/source/storyboard.json`.
+   - meaning-first synthesis: create `video_semantic_packet` containing `app_meaning_summary`, `app_logic_hypothesis`, `feature_flow_from_video`, `visual_elements_from_video`, `post_copy_evidence`, `speech_transcript_evidence`, `keyframe_storyboard_evidence`, and `uncertainty_notes`.
+   - If the three evidence lanes disagree, trust explicit speech/post copy over isolated visuals, then use keyframes to ground UI and interaction details.
+5. Capture reference UI images. When the source is a Xiaohongshu link, a product/intro screenshot, or any visual material that shows UI and interaction, you MUST save the referenced UI as image files so the design stage can feed them into `$imagegen`:
    - Save every user-provided screenshot or image to `<app-directory>/source/reference-ui/` as `.png` or `.jpg`.
    - When you can load the Xiaohongshu note through a tool or browser, capture or download its post images (UI cards, carousel frames, layout) into the same directory.
    - Use stable, ordered filenames such as `ref-01.png`, `ref-02.png`.
    - Record every saved file in `reference_ui_images` with a short description and its `origin`.
    - Do not reproduce watermarks or creator identity in the generated app, source brief, or image prompt. Crop only when useful; otherwise keep the reference image unchanged so layout, components, and visual structure remain visible.
    - Skip this capture ONLY when the user explicitly says not to use a reference image, or specifies a different UI/style to build instead. When skipped, leave `reference_ui_images` empty and record the reason in `reference_ui_note`.
-5. Produce one concise `source/source-brief.json`:
+6. Produce one concise `source/source-brief.json`:
    - product intent;
    - target user;
    - primary loop;
    - feature candidates with source evidence;
    - UI observations: layout, components, visual style, imagery, copy tone, motion/audio clues;
+   - `video_semantic_packet` for video-heavy sources, using the three evidence lanes rather than screenshots alone;
    - `reference_ui_images` captured in step 4 (and `reference_ui_note` when capture was skipped);
    - XHS MCP fields when the source is Xiaohongshu: `xhs_mcp_status`, `xhs_mcp_tool`, and `xhs_mcp_artifacts`;
    - must-recreate items;
    - avoid-copying items.
-6. Convert source material into an original Eazo app direction. Preserve idea and UI logic, not watermarks, creator names, private data, or long verbatim captions.
-7. Parse the written JSON and validate:
+7. Convert source material into an original Eazo app direction. Preserve idea and UI logic, not watermarks, creator names, private data, or long verbatim captions.
+8. Parse the written JSON and validate:
    - `schema_version` is `"1.0"`;
    - `product_intent`, `target_user`, and `primary_loop` are non-empty;
    - at least one feature candidate exists;
+   - video-heavy sources include `video_semantic_packet.app_meaning_summary`, `app_logic_hypothesis`, and at least two evidence lanes unless blocked by source access;
    - for a visual source, `reference_ui_images` is non-empty unless the user opted out (then `reference_ui_note` explains why);
    - `confidence` is `high`, `medium`, or `low`.
 

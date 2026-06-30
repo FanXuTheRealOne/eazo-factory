@@ -13,7 +13,7 @@ const manifest = JSON.parse(
   fs.readFileSync(path.join(pluginRoot, ".codex-plugin/plugin.json"), "utf8"),
 );
 if (manifest.name !== "eazo-factory") throw new Error("wrong plugin name");
-if (manifest.version !== "0.1.6") throw new Error("wrong plugin version");
+if (manifest.version !== "0.1.7") throw new Error("wrong plugin version");
 if (manifest.skills !== "./skills/") throw new Error("wrong skills path");
 if (manifest.author?.name !== "EazoAI") throw new Error("wrong author name");
 
@@ -27,31 +27,34 @@ if (interfaceBlock.shortDescription !== "Generate reviewed Eazo apps from prompt
 }
 if (
   interfaceBlock.longDescription !==
-  "Eazo Factory turns one product prompt, Xiaohongshu link, screenshot set, or batch input file into standardized bilingual Eazo apps using the official Eazo Next.js template, optional authenticated XHS MCP source extraction, a $imagegen UI reference board with an asset library, deterministic checks, mandatory independent review, a batch runner for parallel Codex workers, and a visual onboarding guide for first-time users."
+  "Eazo Factory turns one product prompt, Xiaohongshu link, video demo, screenshot set, or batch input file into standardized bilingual Eazo apps using the official Eazo Next.js template, optional authenticated XHS MCP source extraction, video semantic understanding, a $imagegen UI reference board with an asset library, deterministic checks, mandatory independent review, a batch runner for parallel Codex workers, and a visual onboarding guide for first-time users."
 ) {
   throw new Error("wrong longDescription");
 }
 if (interfaceBlock.developerName !== "EazoAI") throw new Error("wrong developerName");
 if (interfaceBlock.category !== "Developer Tools") throw new Error("wrong category");
 if (!Array.isArray(interfaceBlock.capabilities)) throw new Error("capabilities must be an array");
-if (interfaceBlock.capabilities.length !== 6) throw new Error("wrong capabilities length");
+if (interfaceBlock.capabilities.length !== 7) throw new Error("wrong capabilities length");
 if (interfaceBlock.capabilities[0] !== "Generate standardized Eazo apps from the official template") {
   throw new Error("wrong first capability");
 }
 if (interfaceBlock.capabilities[1] !== "Extract app briefs from Xiaohongshu links, XHS MCP, and screenshots") {
   throw new Error("wrong second capability");
 }
-if (interfaceBlock.capabilities[2] !== "Create UI reference boards with reusable asset libraries") {
+if (interfaceBlock.capabilities[2] !== "Understand video demos through post copy, speech transcripts, and keyframe storyboards") {
   throw new Error("wrong third capability");
 }
-if (interfaceBlock.capabilities[3] !== "Audit every interactive control with an independent reviewer") {
+if (interfaceBlock.capabilities[3] !== "Create UI reference boards with reusable asset libraries") {
   throw new Error("wrong fourth capability");
 }
-if (interfaceBlock.capabilities[4] !== "Batch-run many sources through parallel Codex workers") {
+if (interfaceBlock.capabilities[4] !== "Audit every interactive control with an independent reviewer") {
   throw new Error("wrong fifth capability");
 }
-if (interfaceBlock.capabilities[5] !== "Use authenticated Xiaohongshu MCP source collection when available") {
+if (interfaceBlock.capabilities[5] !== "Batch-run many sources through parallel Codex workers") {
   throw new Error("wrong sixth capability");
+}
+if (interfaceBlock.capabilities[6] !== "Use authenticated Xiaohongshu MCP source collection when available") {
+  throw new Error("wrong seventh capability");
 }
 if (!Array.isArray(interfaceBlock.defaultPrompt)) throw new Error("defaultPrompt must be an array");
 if (interfaceBlock.defaultPrompt.length !== 1) throw new Error("wrong defaultPrompt length");

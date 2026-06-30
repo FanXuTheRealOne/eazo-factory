@@ -1,6 +1,6 @@
 {
   "name": "eazo-factory",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Generate bilingual, polished Eazo apps with Codex.",
   "author": {
     "name": "EazoAI"
@@ -9,12 +9,13 @@
   "interface": {
     "displayName": "Eazo Factory",
     "shortDescription": "Generate reviewed Eazo apps from prompts, links, screenshots, or batches.",
-    "longDescription": "Eazo Factory turns one product prompt, Xiaohongshu link, screenshot set, or batch input file into standardized bilingual Eazo apps using the official Eazo Next.js template, optional authenticated XHS MCP source extraction, a $imagegen UI reference board with an asset library, deterministic checks, mandatory independent review, a batch runner for parallel Codex workers, and a visual onboarding guide for first-time users.",
+    "longDescription": "Eazo Factory turns one product prompt, Xiaohongshu link, video demo, screenshot set, or batch input file into standardized bilingual Eazo apps using the official Eazo Next.js template, optional authenticated XHS MCP source extraction, video semantic understanding, a $imagegen UI reference board with an asset library, deterministic checks, mandatory independent review, a batch runner for parallel Codex workers, and a visual onboarding guide for first-time users.",
     "developerName": "EazoAI",
     "category": "Developer Tools",
     "capabilities": [
       "Generate standardized Eazo apps from the official template",
       "Extract app briefs from Xiaohongshu links, XHS MCP, and screenshots",
+      "Understand video demos through post copy, speech transcripts, and keyframe storyboards",
       "Create UI reference boards with reusable asset libraries",
       "Audit every interactive control with an independent reviewer",
       "Batch-run many sources through parallel Codex workers",

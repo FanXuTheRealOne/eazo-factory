@@ -50,6 +50,14 @@ The workflow can extract a source brief from links or screenshots, then produces
 
 When an authenticated XHS MCP / Xiaohongshu MCP tool is available, source intake tries it before generic browser access. Successful MCP extraction writes `source/raw/xhs-note.json`, `source/media/`, and `source/reference-ui/` before the design stage.
 
+For video-heavy sources, especially app demo or voiceover walkthrough posts, source intake must build a `video_semantic_packet` from:
+
+- post copy, title, tags, and visible overlay text;
+- speech transcript saved at `source/transcript/video-transcript.txt`;
+- ordered keyframes under `source/keyframes/` plus `source/storyboard.json`.
+
+The downstream idea and design stages use this semantic packet before styling from isolated screenshots.
+
 ## Batch use
 
 From Codex:

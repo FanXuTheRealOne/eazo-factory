@@ -35,6 +35,7 @@ Choose the art direction that best serves the product. Use a user-requested dire
    - a compact asset-library grid in the same image with the exact mapped button/toggle styles, decorative parts, background material, texture fragments, icon style, state elements, motion notes, and BGM mood;
    - each asset specimen should feel generated from the same locked style, like a coherent mini asset library;
    - source-derived UI layout, component shapes, visual motifs, content hierarchy, and copy tone when `source/source-brief.json` exists;
+   - for video sources, use the keyframe storyboard and visual elements from evidence to choose components, scene hierarchy, character/prop motifs, and motion cues; do not decorate from isolated screenshots without matching the semantic packet;
    - no extra navigation or decorative controls outside the interaction inventory;
    - clear distinction between shipped screen controls and non-interactive asset specimens.
 5. Include the product purpose, selected art direction, mobile viewport, state shown, interaction inventory, hierarchy, motion direction, BGM mood when required, source UI observations when present, and this exact paragraph:
@@ -49,10 +50,15 @@ Choose the art direction that best serves the product. Use a user-requested dire
 
    > Use the source material as product and visual inspiration: preserve its app idea, hierarchy, important UI elements, mood, and reusable visual parts. Create an original Eazo interface; do not copy watermarks, creator names, private profile data, or long captions verbatim.
 
+   When `source/source-brief.json` contains `video_semantic_packet`, also include this exact paragraph:
+
+   > This source came from a video/app demo. Base the app concept on the semantic packet first: post copy, speech transcript, and keyframe storyboard together. Use screenshots as visual evidence, not as the whole meaning. Preserve the demonstrated app logic, feature flow, and explained user value before styling details.
+
 6. Explicitly invoke `$imagegen` with that prompt and save one polished mobile reference board to `<app-directory>/design/ui-reference.png`.
    - When `source/source-brief.json` lists `reference_ui_images`, resolve each `path` relative to `<app-directory>` and verify the file exists and is readable. If any listed reference image is missing or unreadable, stop design and report the missing absolute path; do not silently generate without references.
    - Before invoking `$imagegen`, inspect/load every resolved reference image with `view_image` so the built-in image tool can see it in the conversation context. Label each loaded image explicitly as `reference image, not edit target`.
    - Pass the loaded reference images to `$imagegen` as visual reference inputs so the generated board follows the referenced UI layout, components, and visual structure.
+   - If `source/keyframes/` exists, inspect/load representative keyframes with `view_image` before `$imagegen` and label them as `video keyframe evidence, not edit target`.
    - Skip passing the reference images ONLY when the user explicitly asked not to use a reference image, or specified a different UI/style to build instead (as recorded in `reference_ui_note`).
    - Still produce an original Eazo interface: follow the referenced UI structure but do not reproduce watermarks, creator identity, or private data.
 7. Inspect the generated image rather than trusting the prompt:
